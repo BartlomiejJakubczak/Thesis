@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "951065107306",
+    "firebase_url": "https://thesis-db8b6.firebaseio.com",
+    "project_id": "thesis-db8b6",
+    "storage_bucket": "thesis-db8b6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951065107306:android:2d7872643efd360d",
+        "android_client_info": {
+          "package_name": "com.example.bartomiejjakubczak.thesis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951065107306-af04padno6b5624gmilik67ln6c4fnib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bartomiejjakubczak.thesis",
+            "certificate_hash": "29a498dba71ba9e3c7a83253abd23fbfefa0045a"
+          }
+        },
+        {
+          "client_id": "951065107306-s2l6i7hqg1reoibug2skd7l8r25iph7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv3ynkkmV2xFK1tKs1T98rHEDlRXDiGls"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951065107306-s2l6i7hqg1reoibug2skd7l8r25iph7e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
