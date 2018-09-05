@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Thesis</string>
     <string name="sign_out">Sign Out</string>
+    <string name="verification_headline">A verification email has been sent to your account.</string>
+    <string name="verification_explanation">Please sign in after you completed verification.</string>
+    <string name="verification_signin_button">Sign In</string>
+    <string name="verification_resend_button">Send the verification link again</string>
 </resources>
