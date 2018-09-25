@@ -5,4 +5,26 @@
     <string name="verification_explanation">Please sign in after you completed verification.</string>
     <string name="verification_signin_button">Sign In</string>
     <string name="verification_resend_button">Send the verification link again</string>
+    <string name="create_room_dialog_title">Let us get started!</string>
+    <string name="create_room_dialog_message">Seems like you do not have a room yet. Do you want to create one?</string>
+    <string name="create_room_dialog_positive">Yes</string>
+    <string name="create_room_dialog_negative">No, let me do it on my own</string>
+    <string name="logs_email_sent">Email successfully sent.</string>
+    <string name="logs_email_fail">Something went wrong.</string>
+    <string name="logs_user_created">User created!</string>
+    <string name="logs_signin_canceled">Sign in canceled!</string>
+    <string name="logs_mainActivity_onCanceled">onCancelled</string>
+    <string name="firebase_reference_users">users</string>
+    <string name="firebase_reference_email">email</string>
+    <string name="tags_create_room_dialog">create room dialog</string>
+    <string name="hint_room_name">Name</string>
+    <string name="hint_room_address">Address</string>
+    <string name="label_room_name">Name</string>
+    <string name="label_room_address">Address</string>
+    <string name="button_text_create_room">Create</string>
+    <string name="firebase_references_rooms">rooms</string>
+    <string name="firebase_reference_user_rooms">userRooms</string>
+    <string name="firebase_reference_room_users">roomUsers</string>
+    <string name="logs_createRoomActivity_nosnapshot">dataSnapshot not found</string>
+    <string name="logs_room_created">Room created!</string>
 </resources>

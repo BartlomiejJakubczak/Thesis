@@ -40,6 +40,7 @@ public class LogInActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         initializeFirebaseComponents();
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -68,10 +69,11 @@ public class LogInActivity extends AppCompatActivity{
             }
         };
     }
+
     private void initializeFirebaseComponents() {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
     }
 
     private void verifyEmail(FirebaseUser user) {
@@ -79,9 +81,9 @@ public class LogInActivity extends AppCompatActivity{
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, "Email successfully sent.");
+                    Log.d(TAG, getString(R.string.logs_email_sent));
                 } else {
-                    Log.d(TAG, "Something went wrong.");
+                    Log.d(TAG, getString(R.string.logs_email_fail));
                 }
             }
         });
@@ -96,11 +98,14 @@ public class LogInActivity extends AppCompatActivity{
         final String userName = userNameAndSurname[0];
         final String userSurname = userNameAndSurname[1];
 
-        mUsersDatabaseReference.orderByChild("email").equalTo(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+        mUsersDatabaseReference.orderByChild(getString(R.string.firebase_reference_email))
+                .equalTo(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    mUsersDatabaseReference.push().setValue(new User(userName, userSurname, userEmail));
+                    String dotlessEmail = userEmail.replaceAll("[\\s.]", "");
+                    mUsersDatabaseReference.child(dotlessEmail).setValue(new User(userName, userSurname, userEmail));
+                    Log.d(TAG, getString(R.string.logs_user_created));
                 }
             }
 
@@ -118,7 +123,7 @@ public class LogInActivity extends AppCompatActivity{
             if (resultCode == RESULT_OK) {
                 //TODO duplicaion of activities after signup
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(LogInActivity.this, "Sign in canceled!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LogInActivity.this, getString(R.string.logs_signin_canceled), Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
