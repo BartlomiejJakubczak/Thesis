@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group
+        android:id="@+id/Flat"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_create_flat"
+            android:icon="@drawable/ic_add"
+            android:title="@string/drawer_menu_create" />
+
+        <item
+            android:id="@+id/nav_edit_flat"
+            android:icon="@drawable/ic_edit"
+            android:title="@string/drawer_menu_edit" />
+
+        <item
+            android:id="@+id/nav_delete_flat"
+            android:icon="@drawable/ic_delete"
+            android:title="@string/drawer_menu_delete" />
+
+        <item
+            android:id="@+id/nav_add_members"
+            android:icon="@drawable/ic_person_add"
+            android:title="@string/drawer_menu_add_member" />
+
+    </group>
+</menu>

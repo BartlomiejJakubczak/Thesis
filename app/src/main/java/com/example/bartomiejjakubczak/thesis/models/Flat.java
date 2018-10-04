@@ -1,21 +1,19 @@
 package com.example.bartomiejjakubczak.thesis.models;
 
-import com.example.bartomiejjakubczak.thesis.R;
-
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Room {
+public class Flat {
 
     private String name;
     private String address;
     private String key;
+    private String owner;
 
-    public Room(String name, String address) {
+    public Flat(String name, String address, String ownerEmailAddress) {
         this.name = name;
         this.address = address;
         key = generateKey();
+        this.owner = ownerEmailAddress;
     }
 
     public String getName() {
@@ -36,6 +34,10 @@ public class Room {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     private String generateKey() {

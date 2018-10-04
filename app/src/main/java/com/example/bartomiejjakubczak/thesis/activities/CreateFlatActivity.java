@@ -1,4 +1,4 @@
-package com.example.bartomiejjakubczak.thesis;
+package com.example.bartomiejjakubczak.thesis.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.bartomiejjakubczak.thesis.models.Room;
+import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,61 +23,60 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Map;
+public class CreateFlatActivity extends AppCompatActivity{
 
-public class CreateRoomActivity extends AppCompatActivity{
-
-    private static final String TAG = "CreateRoomActivity";
-    private EditText roomName;
-    private EditText roomAddress;
+    private static final String TAG = "CreateFlatActivity";
+    private String userDotlessEmail;
+    private EditText flatName;
+    private EditText flatAddress;
     private TextView nameLabel;
     private TextView addressLabel;
-    private Button createRoom;
+    private Button createFlat;
     private FirebaseUser currentUser;
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mRoomsDatabaseReference;
+    private DatabaseReference mFlatsDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
     private DatabaseReference mSearchedUserDatabaseReference;
-    private DatabaseReference mUsersRoomsDatabaseReference;
-    private DatabaseReference mRoomsUsersDatabaseReference;
+    private DatabaseReference mUsersFlatsDatabaseReference;
+    private DatabaseReference mFlatsUsersDatabaseReference;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_room);
+        setContentView(R.layout.activity_create_flat);
         setViews();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userDotlessEmail = currentUser.getEmail().replaceAll("[\\s.]", "");
         initializeFirebaseComponents();
 
-        createRoom.setOnClickListener(new View.OnClickListener() {
+        createFlat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = roomName.getText().toString();
-                String address = roomAddress.getText().toString();
+                String name = flatName.getText().toString();
+                String address = flatAddress.getText().toString();
                 boolean validName;
                 boolean validAddress;
 
                 if (checkIfEmpty(name)) {
-                    roomName.setError("This field cannot be blank");
-                    roomName.setText("");
-                    roomName.setHintTextColor(getResources().getColor(R.color.red));
+                    flatName.setError("This field cannot be blank");
+                    flatName.setText("");
+                    flatName.setHintTextColor(getResources().getColor(R.color.red));
                     validName = false;
                 } else {
                     validName = true;
                 }
 
                 if (checkIfEmpty(address)) {
-                    roomAddress.setError("This field cannot be blank");
-                    roomAddress.setText("");
-                    roomAddress.setHintTextColor(getResources().getColor(R.color.red));
+                    flatAddress.setError("This field cannot be blank");
+                    flatAddress.setText("");
+                    flatAddress.setHintTextColor(getResources().getColor(R.color.red));
                     validAddress = false;
                 } else {
                     validAddress = true;
                 }
 
                 if (validAddress && validName) {
-                    createNewRoom(roomName.getText().toString(), roomAddress.getText().toString());
+                    createNewFlat(flatName.getText().toString(), flatAddress.getText().toString(), userDotlessEmail);
                 }
 
             }
@@ -85,18 +85,18 @@ public class CreateRoomActivity extends AppCompatActivity{
 
     private void initializeFirebaseComponents() {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRoomsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_rooms));
+        mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
-        mUsersRoomsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_rooms));
-        mRoomsUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_room_users));
+        mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
+        mFlatsUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_flats_users));
     }
 
     private void setViews() {
-        roomName = findViewById(R.id.room_name);
-        roomAddress = findViewById(R.id.room_address);
+        flatName = findViewById(R.id.flat_name);
+        flatAddress = findViewById(R.id.flat_address);
         nameLabel = findViewById(R.id.name_label);
         addressLabel = findViewById(R.id.address_label);
-        createRoom = findViewById(R.id.create_room_button);
+        createFlat = findViewById(R.id.create_flat_button);
     }
 
     private boolean checkIfEmpty(String string) {
@@ -108,13 +108,13 @@ public class CreateRoomActivity extends AppCompatActivity{
 //        return string.matches(".*\\d+.*");
 //    }
 
-    private void createNewRoom(final String roomName, final String roomAddress) {
-        final Room newRoom = new Room(roomName, roomAddress);
+    private void createNewFlat(final String roomName, final String roomAddress, String userDotlessEmail) {
+        final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail);
 
-        mRoomsUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mFlatsUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mRoomsUsersDatabaseReference.child(newRoom.getKey()).setValue(currentUser.getEmail().replaceAll("[\\s.]", ""));
+                mFlatsUsersDatabaseReference.child(newFlat.getKey()).child(currentUser.getEmail().replaceAll("[\\s.]", "")).setValue(true);
             }
 
             @Override
@@ -123,10 +123,10 @@ public class CreateRoomActivity extends AppCompatActivity{
             }
         });
 
-        mUsersRoomsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mUsersFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mUsersRoomsDatabaseReference.child(currentUser.getEmail().replaceAll("[\\s.]", "")).setValue(newRoom.getKey());
+                mUsersFlatsDatabaseReference.child(currentUser.getEmail().replaceAll("[\\s.]", "")).child(newFlat.getKey()).setValue(true);
             }
 
             @Override
@@ -135,14 +135,14 @@ public class CreateRoomActivity extends AppCompatActivity{
             }
         });
 
-        mRoomsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mRoomsDatabaseReference.child(newRoom.getKey()).setValue(newRoom).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mFlatsDatabaseReference.child(newFlat.getKey()).setValue(newFlat).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, getString(R.string.logs_room_created));
+                            Log.d(TAG, getString(R.string.logs_flat_created));
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);
                             finish();
