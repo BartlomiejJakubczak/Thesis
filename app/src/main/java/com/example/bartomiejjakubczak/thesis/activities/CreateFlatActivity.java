@@ -1,7 +1,9 @@
 package com.example.bartomiejjakubczak.thesis.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,7 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class CreateFlatActivity extends AppCompatActivity{
+public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs{
 
     private static final String TAG = "CreateFlatActivity";
     private String userDotlessEmail;
@@ -81,6 +84,16 @@ public class CreateFlatActivity extends AppCompatActivity{
 
             }
         });
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return null;
     }
 
     private void initializeFirebaseComponents() {
@@ -143,6 +156,8 @@ public class CreateFlatActivity extends AppCompatActivity{
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, getString(R.string.logs_flat_created));
+                            putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), newFlat.getName());
+                            putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), newFlat.getAddress());
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);
                             finish();

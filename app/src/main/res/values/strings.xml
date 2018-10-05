@@ -33,4 +33,7 @@
     <string name="drawer_menu_add_member">Add member</string>
     <string name="drawer_header_title">Name of flat</string>
     <string name="drawer_header_subtitle">Address of flat</string>
+    <string name="shared_prefs_flat_name">Flat name</string>
+    <string name="shared_prefs_flat_address">Flat address</string>
+    <string name="shared_prefs_user_email">Current user email address without dots</string>
 </resources>
