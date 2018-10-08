@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,11 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class LogInActivity extends AppCompatActivity{
+public class LogInActivity extends AppCompatActivity implements FirebaseConnection {
 
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 1;
-    private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -52,6 +52,8 @@ public class LogInActivity extends AppCompatActivity{
                         verifyEmail(user);
                         finish();
                     } else {
+                        String userDotlessEmail = user.getEmail().replaceAll("[\\s.]", "");
+                        initializeFirebaseDatabaseReferences(userDotlessEmail);
                         createNewUserInDatabase(user);
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
@@ -71,26 +73,32 @@ public class LogInActivity extends AppCompatActivity{
         };
     }
 
-    private void initializeFirebaseComponents() {
+    @Override
+    public void initializeFirebaseComponents() {
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
+    }
+
+    @Override
+    public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
+        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
     }
 
+    /**
+     * Sends email verification to the user and takes the user to verification activity.
+     * @param user user who is trying to log in
+     */
+
     private void verifyEmail(FirebaseUser user) {
-        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, getString(R.string.logs_email_sent));
-                } else {
-                    Log.d(TAG, getString(R.string.logs_email_fail));
-                }
-            }
-        });
+        user.sendEmailVerification();
         Intent intent = new Intent(this, VerificationActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * Creates the new user in the Firebase Database.
+     * @param user newly created user's profile
+     */
 
     private void createNewUserInDatabase(final FirebaseUser user) {
         final String userEmail = user.getEmail();
@@ -122,7 +130,7 @@ public class LogInActivity extends AppCompatActivity{
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                //TODO duplicaion of activities after signup
+                //TODO duplication of activities after signup
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(LogInActivity.this, getString(R.string.logs_signin_canceled), Toast.LENGTH_SHORT).show();
                 finish();

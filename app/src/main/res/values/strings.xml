@@ -7,8 +7,10 @@
     <string name="verification_resend_button">Send the verification link again</string>
     <string name="create_flat_dialog_title">Let us get started!</string>
     <string name="create_flat_dialog_message">Seems like you do not have a flat yet. Let us create one!</string>
-    <string name="create_flat_dialog_positive">Ok</string>
+    <string name="create_flat_dialog_positive">OK</string>
     <string name="create_flat_dialog_negative">Join an existing flat</string>
+    <string name="delete_flat_dialog_message">Are you sure you want to delete this flat?</string>
+    <string name="delete_flat_dialog_positive">Yes</string>
     <string name="logs_email_sent">Email successfully sent.</string>
     <string name="logs_email_fail">Something went wrong.</string>
     <string name="logs_user_created">User created!</string>
@@ -17,6 +19,7 @@
     <string name="firebase_reference_users">users</string>
     <string name="firebase_reference_email">email</string>
     <string name="tags_create_flat_dialog">create flat dialog</string>
+    <string name="tags_delete_flat_dialog">delete flat dialog</string>
     <string name="hint_flat_name">Name</string>
     <string name="hint_flat_address">Address</string>
     <string name="label_flat_name">Name</string>
@@ -28,12 +31,15 @@
     <string name="logs_createFlatActivity_nosnapshot">dataSnapshot not found</string>
     <string name="logs_flat_created">Flat created!</string>
     <string name="drawer_menu_create">Create new flat</string>
-    <string name="drawer_menu_edit">Edit flat</string>
+    <string name="drawer_menu_edit_flat">Edit flat</string>
     <string name="drawer_menu_delete">Delete flat</string>
-    <string name="drawer_menu_add_member">Add member</string>
+    <string name="drawer_menu_switch_flat">Switch current flat</string>
+    <string name="drawer_menu_edit_profile">Edit profile</string>
     <string name="drawer_header_title">Name of flat</string>
     <string name="drawer_header_subtitle">Address of flat</string>
     <string name="shared_prefs_flat_name">Flat name</string>
     <string name="shared_prefs_flat_address">Flat address</string>
     <string name="shared_prefs_user_email">Current user email address without dots</string>
+    <string name="shared_prefs_flat_key">Flat key</string>
+    <string name="delete_flat_dialog_negative">No</string>
 </resources>

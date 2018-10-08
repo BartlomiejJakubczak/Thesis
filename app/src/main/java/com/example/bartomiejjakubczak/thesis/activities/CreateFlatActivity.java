@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,7 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs{
+public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection {
 
     private static final String TAG = "CreateFlatActivity";
     private String userDotlessEmail;
@@ -39,7 +40,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mFlatsDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mSearchedUserDatabaseReference;
+//    private DatabaseReference mSearchedUserDatabaseReference;
     private DatabaseReference mUsersFlatsDatabaseReference;
     private DatabaseReference mFlatsUsersDatabaseReference;
 
@@ -51,6 +52,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         userDotlessEmail = currentUser.getEmail().replaceAll("[\\s.]", "");
         initializeFirebaseComponents();
+        initializeFirebaseDatabaseReferences(userDotlessEmail);
 
         createFlat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,23 +88,46 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
         });
     }
 
+    /**
+     * Puts given String into shared preferences for later use, for example to indicate the currently selected flat.
+     * @param context context from which preferences are taken
+     * @param label key under which the String is stored
+     * @param string the String value to be stored
+     */
+
     @Override
     public void putStringToSharedPrefs(Context context, String label, String string) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
     }
+
+    /**
+     * Loads String values located in shared preferences.
+     * @param context context from which preferences are taken
+     * @param label key under which the String is stored
+     * @return the String located under specified label
+     */
 
     @Override
     public String loadStringFromSharedPrefs(Context context, String label) {
         return null;
     }
 
-    private void initializeFirebaseComponents() {
+    @Override
+    public void initializeFirebaseComponents() {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+    }
+
+    @Override
+    public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
         mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
         mFlatsUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_flats_users));
     }
+
+    /**
+     * Sets all views visible inside this activity.
+     */
 
     private void setViews() {
         flatName = findViewById(R.id.flat_name);
@@ -112,6 +137,12 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
         createFlat = findViewById(R.id.create_flat_button);
     }
 
+    /**
+     * Checks if given String is empty.
+     * @param string The given String
+     * @return returns true if given String is empty, false otherwise.
+     */
+
     private boolean checkIfEmpty(String string) {
         String testString = string.trim();
         return "".equals(testString);
@@ -120,6 +151,14 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
 //    private boolean checkIfNumbers(String string) {
 //        return string.matches(".*\\d+.*");
 //    }
+
+    /**
+     * Creates new flat and stores it in Firebase Database.
+     * The name and address of the new flat are being stored in shared preferences for later use.
+     * @param roomName Name of the flat specified by the user
+     * @param roomAddress Address of the flat specified by the user
+     * @param userDotlessEmail Email address without dots of the user
+     */
 
     private void createNewFlat(final String roomName, final String roomAddress, String userDotlessEmail) {
         final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail);
@@ -158,6 +197,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                             Log.d(TAG, getString(R.string.logs_flat_created));
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), newFlat.getName());
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), newFlat.getAddress());
+                            putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key), newFlat.getKey());
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);
                             finish();

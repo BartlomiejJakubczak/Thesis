@@ -16,6 +16,9 @@ package com.example.bartomiejjakubczak.thesis.activities;
 //TODO LOG CONTINUED: When adding new user generate autoamtically tag for him and let him edit it later in profile (for example promting a tip)
 //TODO LOG CONTINUED: Think if it's necessary to add owner of flat (as a field in flats for example)
 //TODO LOG 04.10.18: think of the way to cache recently used flat and allow users to switch them
+//TODO LOG 05.10.18: Check if everything works to this point: email verification, first login, account creation (if something goes wrong, check todo in LoginActivity)
+//TODO LOG 08.10.18: you have to change Dialogs from builders to onCreateViews in order to set setCanceledOnTouchOutside to false
+//TODO LOG CONTINUED: might change the create room dialog to some kind of activity to avoid future problems
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
@@ -38,6 +41,8 @@ import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.dialogs.CreateFlatDialogFragment;
+import com.example.bartomiejjakubczak.thesis.dialogs.DeleteFlatDialogFragment;
+import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,7 +52,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity implements SharedPrefs{
+public class MainActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection {
 
     private static final String TAG = "MainActivity";
 
@@ -62,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedUserReference;
     private DatabaseReference mSearchedUserFlatsReference;
+    private DatabaseReference mUsersFlatsDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +143,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
         }
     }
 
+    /**
+     * Updates the UI based on flat selected by user
+     */
+
     private void updateUI() {
         String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
         String currentFlatAddress = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address));
@@ -149,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
      * Initializes firebase components necessary for this activity.
      */
 
-    private void initializeFirebaseComponents() {
+    @Override
+    public void initializeFirebaseComponents() {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
     }
@@ -160,10 +171,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
      *                     email address is the key of user table.
      */
 
-    private void initializeFirebaseDatabaseReferences(String dotlessEmail) {
+    @Override
+    public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         DatabaseReference mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
         mSearchedUserReference = mUsersDatabaseReference.child(dotlessEmail);
-        DatabaseReference mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
+        mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
         mSearchedUserFlatsReference = mUsersFlatsDatabaseReference.child(dotlessEmail);
     }
 
@@ -181,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
     }
 
     /**
-     * Initializes the drawer
+     * Initializes the drawer.
      */
 
     private void setDrawer() {
@@ -193,8 +205,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                //TODO response to multiple items in drawer
-                mDrawerLayout.closeDrawers();
+                switch (item.getItemId()) {
+                    case R.id.nav_create_flat:
+                        Intent intent = new Intent(getApplicationContext(), CreateFlatActivity.class);
+                        startActivity(intent);
+                }
                 return true;
             }
         });
@@ -223,12 +238,19 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
         });
     }
 
+    /**
+     * If the user doesn't have any flat or doesn't belong to any, this method shows dialog which informs
+     * user that he/she has to either create one or join one.
+     */
+
     private void decideToShowCreateFlatDialog() {
         mSearchedUserFlatsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    showCreateFlatAlertDialog();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    DialogFragment createFlatAlertDialog = new CreateFlatDialogFragment();
+                    createFlatAlertDialog.show(fragmentManager, getString(R.string.tags_create_flat_dialog));
                 }
             }
 
@@ -237,11 +259,5 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs{
 
             }
         });
-    }
-
-    private void showCreateFlatAlertDialog() {
-        FragmentManager fragmentManager = getFragmentManager();
-        DialogFragment createFlatAlertDialog = new CreateFlatDialogFragment();
-        createFlatAlertDialog.show(fragmentManager, getString(R.string.tags_create_flat_dialog));
     }
 }
