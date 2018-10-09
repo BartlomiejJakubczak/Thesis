@@ -42,4 +42,11 @@
     <string name="shared_prefs_user_email">Current user email address without dots</string>
     <string name="shared_prefs_flat_key">Flat key</string>
     <string name="delete_flat_dialog_negative">No</string>
+    <string name="hint_profile_firstname">First name</string>
+    <string name="label_first_name">First name</string>
+    <string name="hint_profile_surname">Surname</string>
+    <string name="label_surname">Surname</string>
+    <string name="hint_profile_tag">Tag</string>
+    <string name="label_tag">Tag</string>
+    <string name="button_text_done_editing">Done</string>
 </resources>

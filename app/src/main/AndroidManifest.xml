@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.CreateFlatActivity" />
+        <activity android:name=".activities.EditProfileActivity" />
     </application>
 
 </manifest>

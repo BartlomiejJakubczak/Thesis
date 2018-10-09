@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         String currentFlatName = loadStringFromSharedPrefs(this, getString(R.string.shared_prefs_flat_name));
         final List<String> keys = new ArrayList<>();
         if (currentFlatName.equals("No flat yet") || currentFlatName.isEmpty()) {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mSearchedUserFlatsReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -199,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         });
                     } else {
                         showCreateFlatDialog();
+                        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                     }
                 }
 
@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 }
             });
         }
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
     /**
@@ -271,6 +272,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         showDeleteFlatDialog();
                         mDrawerLayout.closeDrawers();
                         return true;
+                    case R.id.nav_edit_profile:
+                        Intent intentEdit = new Intent(getApplicationContext(), EditProfileActivity.class);
+                        startActivity(intentEdit);
+                        mDrawerLayout.closeDrawers();
+                        return true;
                 }
                 return true;
             }
@@ -306,11 +312,13 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
      */
 
     private void decideToShowCreateFlatDialog() {
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mSearchedUserFlatsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
                     showCreateFlatDialog();
+                    mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 } else {
                     setCurrentFlat();
                 }
