@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".activities.CreateFlatActivity" />
         <activity android:name=".activities.EditProfileActivity" />
+        <activity android:name=".activities.EditFlatActivity" />
     </application>
 
 </manifest>

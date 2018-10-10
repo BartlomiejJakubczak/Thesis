@@ -23,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditProfileActivity extends AppCompatActivity implements FirebaseConnection{
+public class EditProfileActivity extends AppCompatActivity implements FirebaseConnection {
 
     private static final String TAG = "EditProfileActivity";
     private String oldTag;
@@ -59,7 +59,7 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
     }
 
     private void setViews() {
-        tag = findViewById(R.id.edit_tag);
+        tag = findViewById(R.id.edit_flat_name);
         Button doneButton = findViewById(R.id.edit_profile_button);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,7 +145,7 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
     }
 
     private void updateTag(String newTag) {
-        mSearchedUserDatabaseReference.child("tag").setValue(newTag).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mSearchedUserDatabaseReference.child("tag").setValue(newTag.trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 //TODO toast maybe? think of a way to inform user about completion

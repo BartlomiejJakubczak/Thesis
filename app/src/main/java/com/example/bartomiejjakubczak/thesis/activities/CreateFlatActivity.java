@@ -81,7 +81,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                 }
 
                 if (validAddress && validName) {
-                    createNewFlat(flatName.getText().toString(), flatAddress.getText().toString(), userDotlessEmail);
+                    createNewFlat(flatName.getText().toString().trim(), flatAddress.getText().toString().trim(), userDotlessEmail.trim());
                 }
 
             }

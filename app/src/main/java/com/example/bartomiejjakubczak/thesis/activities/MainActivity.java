@@ -24,6 +24,9 @@ package com.example.bartomiejjakubczak.thesis.activities;
 //TODO LOG CONTINUED: try to test deleting with 2 users, deleting may not work fine as of 08.10.18
 //TODO LOG CONTINUED: try to deal with situation when user has a flat but he deleted the app and when he opens drawer for the first time he sees "No flat yet", when he opens for 2nd he will see correct result (reason: it takes a bit of time to look into database, so if you immediately open drawer it will show "no flat yet")
 //TODO LOG 09.10.18: in the future disable necessary menu items when current flat is "no flat yet"
+//TODO LOG CONTINUED: keep an eye out on setCurrentFlat() if its okay and if it works fine
+//TODO LOG CONTINUED: Finish EditFlatActivity
+//TODO LOG 10.10.18: IMPORTANTE!!!!!!!!!!! In the future, take care of firebase session being timed out due to inactivity
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
@@ -273,10 +276,14 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_edit_profile:
-                        Intent intentEdit = new Intent(getApplicationContext(), EditProfileActivity.class);
-                        startActivity(intentEdit);
+                        Intent intentEditProfile = new Intent(getApplicationContext(), EditProfileActivity.class);
+                        startActivity(intentEditProfile);
                         mDrawerLayout.closeDrawers();
                         return true;
+                    case R.id.nav_edit_flat:
+                        Intent intentEditFlat = new Intent(getApplicationContext(), EditFlatActivity.class);
+                        startActivity(intentEditFlat);
+                        mDrawerLayout.closeDrawers();
                 }
                 return true;
             }
