@@ -1,0 +1,45 @@
+
+------------------------------------------------------------LOGS---------------------------------------------------------
+
+//TODO LOG: 05.09.18 database rules are changed to test mode and the app crashes without Internet
+//TODO LOG CONTINUED: I successfully search for user and check his hasRoom value
+//TODO LOG CONTINUED: Think of a way to present user with option to create a room if hasRoom is false
+//TODO LOG 13.09.18: I think I will use 4 top-level nodes method
+//TODO LOG CONTINUED: context of mainactivity has to be passed to alertdialog
+//TODO LOG 21.09.18: think of some way to wait for update of hasRoom (or new technique as a whole)
+//TODO LOG CONTINUED: next steps: show created room in a way you think of (in side panel or something)
+//TODO LOG CONTINUED: next steps continued: get rid of hasRoom by searching for rooms in UserFlats if given user has any, then do activity transition in OnCompleteListener of CreateRoom in CreateFlatActivity
+//TODO LOG 25.09.18: Replace word room with another word
+//TODO LOG CONTINUED: Make suitable interfaces to cleanup your code
+//TODO LOG 02.10.2018: Replace in firebase database names of flats and users with trues, rename last instances of wrong variable names (in FlatUsers, UserFlats) and make them Set instead of Array
+//TODO LOG CONTINUED: Think of a way to group options in drawer (flat subgroups etc.)
+//TODO LOG 03.10.18: Create option to join a flat instead of creating one
+//TODO LOG CONTINUED: When adding new user generate autoamtically tag for him and let him edit it later in profile (for example promting a tip)
+//TODO LOG CONTINUED: Think if it's necessary to add owner of flat (as a field in flats for example)
+//TODO LOG 04.10.18: think of the way to cache recently used flat and allow users to switch them
+//TODO LOG 05.10.18: Check if everything works to this point: email verification, first login, account creation (if something goes wrong, check todo in LoginActivity)
+//TODO LOG 08.10.18: you have to change Dialogs from builders to onCreateViews in order to set setCanceledOnTouchOutside to false
+//TODO LOG CONTINUED: might change the create room dialog to some kind of activity to avoid future problems
+//TODO LOG CONTINUED: deal with no flat yet in case of a situation in which user deletes app and there is no current flat in shared prefs
+//TODO LOG CONTINUED: think of a way to not use static context of MainActivity (which still may be fine, because it's still in foreground during DialogFragment)
+//TODO LOG CONTINUED: try to test deleting with 2 users, deleting may not work fine as of 08.10.18
+//TODO LOG CONTINUED: try to deal with situation when user has a flat but he deleted the app and when he opens drawer for the first time he sees "No flat yet", when he opens for 2nd he will see correct result (reason: it takes a bit of time to look into database, so if you immediately open drawer it will show "no flat yet")
+//TODO LOG 09.10.18: in the future disable necessary menu items when current flat is "no flat yet"
+//TODO LOG CONTINUED: keep an eye out on setCurrentFlat() if its okay and if it works fine
+//TODO LOG CONTINUED: Finish EditFlatActivity
+//TODO LOG 10.10.18: IMPORTANTE!!!!!!!!!!! In the future, take care of firebase session being timed out due to inactivity
+//TODO LOG CONTINUED: In the future think about converting all activities in drawer to fragments and present them in main menu
+//TODO LOG CONTINUED: Finish SwitchFlatDialogFragment
+//TODO LOG CONTINUED: It doesnt fetch data on time, think of a way to wait for results somehow
+
+------------------------------------------------------------15.10.2018------------------------------------------------------------
+TO DO:
+- refactor MainActivity (sort the methods, comment and try to simplify code)
+- store crucial data (flats etc.) locally as for example public static arrays
+
+FOR NEXT SESSION:
+- refactor shared prefs for clean code
+- deal with situation when user is deleting his last flat
+
+LONG TIME TO DO:
+- solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)

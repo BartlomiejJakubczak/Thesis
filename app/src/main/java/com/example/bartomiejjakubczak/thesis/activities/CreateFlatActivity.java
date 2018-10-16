@@ -40,7 +40,6 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mFlatsDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
-//    private DatabaseReference mSearchedUserDatabaseReference;
     private DatabaseReference mUsersFlatsDatabaseReference;
     private DatabaseReference mFlatsUsersDatabaseReference;
 
@@ -63,7 +62,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                 boolean validAddress;
 
                 if (checkIfEmpty(name)) {
-                    flatName.setError("This field cannot be blank");
+                    flatName.setError(getString(R.string.error_blank_field));
                     flatName.setText("");
                     flatName.setHintTextColor(getResources().getColor(R.color.red));
                     validName = false;
@@ -72,7 +71,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                 }
 
                 if (checkIfEmpty(address)) {
-                    flatAddress.setError("This field cannot be blank");
+                    flatAddress.setError(getString(R.string.error_blank_field));
                     flatAddress.setText("");
                     flatAddress.setHintTextColor(getResources().getColor(R.color.red));
                     validAddress = false;
@@ -194,12 +193,9 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, getString(R.string.logs_flat_created));
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), newFlat.getName());
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), newFlat.getAddress());
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key), newFlat.getKey());
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(intent);
                             finish();
                         }
                     }

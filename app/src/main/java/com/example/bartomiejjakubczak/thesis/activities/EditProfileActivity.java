@@ -110,7 +110,7 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()){
-                    if (ds.child("tag").getValue().toString().equals(newTag)) {
+                    if (ds.child(getString(R.string.user_node_tag)).getValue().toString().equals(newTag)) {
                         validTagDuplicate = false;
                     } else {
                         validTagDuplicate = true;
@@ -128,13 +128,13 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
 
     private void verdictTag(String newTag) {
         if (!validTagEmpty) {
-            tag.setError("This field cannot be blank");
+            tag.setError(getString(R.string.error_blank_field));
             tag.setText(oldTag);
             tag.setHintTextColor(getResources().getColor(R.color.red));
             tag.requestFocus();
         } else {
             if (!validTagDuplicate) {
-                tag.setError("Tag already exists");
+                tag.setError(getString(R.string.error_tag_exists));
                 tag.setText(oldTag);
                 tag.setHintTextColor(getResources().getColor(R.color.red));
                 tag.requestFocus();
@@ -145,11 +145,10 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
     }
 
     private void updateTag(String newTag) {
-        mSearchedUserDatabaseReference.child("tag").setValue(newTag.trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mSearchedUserDatabaseReference.child(getString(R.string.user_node_tag)).setValue(newTag.trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 //TODO toast maybe? think of a way to inform user about completion
-                Log.d(TAG, "Tag changed");
                 finish();
             }
         });

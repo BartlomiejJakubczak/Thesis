@@ -18,6 +18,7 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.utilities.TinyDB;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -74,41 +75,19 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
     }
 
     private void setCurrentFlat() {
-        final List<String> keys = new ArrayList<>();
-        mUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                        keys.add(ds.getKey());
-                    }
-                    putStringToSharedPrefs(MainActivity.getContext(), "Flat key", keys.get(0));
-                    mFlatsDatabaseReference.child(loadStringFromSharedPrefs(MainActivity.getContext(), "Flat key")).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            String currentFlatName = dataSnapshot.child("name").getValue().toString();
-                            String currentFlatAddress = dataSnapshot.child("address").getValue().toString();
-                            putStringToSharedPrefs(MainActivity.getContext(), "Flat name", currentFlatName);
-                            putStringToSharedPrefs(MainActivity.getContext(), "Flat address", currentFlatAddress);
-                            }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                } else {
-                    putStringToSharedPrefs(MainActivity.getContext(), "Flat name", null);
-                    putStringToSharedPrefs(MainActivity.getContext(), "Flat address", null);
-                    putStringToSharedPrefs(MainActivity.getContext(), "Flat key", null);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        TinyDB tinyDB = new TinyDB(MainActivity.getContext());
+        ArrayList<String> flatNames = tinyDB.getListString("shared_prefs_list_flat_names");
+        ArrayList<String> flatAddresses = tinyDB.getListString("shared_prefs_list_flat_addresses");
+        ArrayList<String> flatKeys = tinyDB.getListString("shared_prefs_list_flat_keys");
+        flatNames.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_name"));
+        flatAddresses.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_address"));
+        flatKeys.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_key"));
+        putStringToSharedPrefs(MainActivity.getContext(), "flat_name", flatNames.get(flatNames.size() - 1));
+        putStringToSharedPrefs(MainActivity.getContext(), "flat_address", flatAddresses.get(flatAddresses.size() - 1));
+        putStringToSharedPrefs(MainActivity.getContext(), "flat_key", flatKeys.get(flatKeys.size() - 1));
+        tinyDB.putListString("shared_prefs_list_flat_names", flatNames);
+        tinyDB.putListString("shared_prefs_list_flat_addresses", flatAddresses);
+        tinyDB.putListString("shared_prefs_list_flat_keys", flatKeys);
     }
 
     @Override

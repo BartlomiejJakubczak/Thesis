@@ -51,7 +51,6 @@ public class VerificationActivity extends AppCompatActivity{
         resendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Button was clicked");
                 sendVerificationEmail(user);
                 delayResendButton();
             }
@@ -60,7 +59,6 @@ public class VerificationActivity extends AppCompatActivity{
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "I got clicked");
                 mFirebaseAuth.signOut();
                 Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
                 startActivity(intent);

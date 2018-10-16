@@ -65,12 +65,12 @@ public class EditFlatActivity extends AppCompatActivity implements FirebaseConne
         checkIfCorrectFlatName(newFlatName);
         checkIfCorrectFlatAddress(newFlatAddress);
         if (!validFlatName) {
-            flatName.setError("This field cannot be blank");
+            flatName.setError(getString(R.string.error_blank_field));
             flatName.setText(oldName);
             flatName.setHintTextColor(getResources().getColor(R.color.red));
             flatName.requestFocus();
         } else if (!validFlatAddress) {
-            flatAddress.setError("This field cannot be blank");
+            flatAddress.setError(getString(R.string.error_blank_field));
             flatAddress.setText(oldAddress);
             flatAddress.setHintTextColor(getResources().getColor(R.color.red));
             flatAddress.requestFocus();
@@ -82,8 +82,8 @@ public class EditFlatActivity extends AppCompatActivity implements FirebaseConne
     private void updateFlatParameters(String newFlatName, String newFlatAddress) {
         putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), newFlatName.trim());
         putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), newFlatAddress.trim());
-        mSearchedFlatDatabaseReference.child("name").setValue(newFlatName.trim());
-        mSearchedFlatDatabaseReference.child("address").setValue(newFlatAddress.trim());
+        mSearchedFlatDatabaseReference.child(getString(R.string.flat_node_name)).setValue(newFlatName.trim());
+        mSearchedFlatDatabaseReference.child(getString(R.string.flat_node_address)).setValue(newFlatAddress.trim());
         finish();
     }
 
@@ -141,6 +141,6 @@ public class EditFlatActivity extends AppCompatActivity implements FirebaseConne
 
     @Override
     public String loadStringFromSharedPrefs(Context context, String label) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, "No flat yet");
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
     }
 }

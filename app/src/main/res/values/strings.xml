@@ -20,6 +20,7 @@
     <string name="firebase_reference_email">email</string>
     <string name="tags_create_flat_dialog">create flat dialog</string>
     <string name="tags_delete_flat_dialog">delete flat dialog</string>
+    <string name="tags_switch_flat_dialog">switch flat dialog</string>
     <string name="hint_flat_name">Name</string>
     <string name="hint_flat_address">Address</string>
     <string name="label_flat_name">Name</string>
@@ -37,10 +38,15 @@
     <string name="drawer_menu_edit_profile">Edit profile</string>
     <string name="drawer_header_title">Name of flat</string>
     <string name="drawer_header_subtitle">Address of flat</string>
-    <string name="shared_prefs_flat_name">Flat name</string>
-    <string name="shared_prefs_flat_address">Flat address</string>
+    <string name="shared_prefs_flat_name">flat_name</string>
+    <string name="shared_prefs_flat_address">flat_address</string>
     <string name="shared_prefs_user_email">Current user email address without dots</string>
-    <string name="shared_prefs_flat_key">Flat key</string>
+    <string name="shared_prefs_flat_key">flat_key</string>
+    <string name="shared_prefs_flat_owner">flat_owner</string>
+    <string name="shared_prefs_list_flat_names">shared_prefs_list_flat_names</string>
+    <string name="shared_prefs_list_flat_addresses">shared_prefs_list_flat_addresses</string>
+    <string name="shared_prefs_list_flat_keys">shared_prefs_list_flat_keys</string>
+    <string name="shared_prefs_list_flat_owners">shared_prefs_list_flat_owners</string>
     <string name="delete_flat_dialog_negative">No</string>
     <string name="hint_profile_firstname">First name</string>
     <string name="label_first_name">First name</string>
@@ -49,4 +55,13 @@
     <string name="hint_profile_tag">Tag</string>
     <string name="label_tag">Tag</string>
     <string name="button_text_done_editing">Done</string>
+    <string name="flat_node_name">name</string>
+    <string name="flat_node_key">key</string>
+    <string name="flat_node_address">address</string>
+    <string name="flat_node_owner">owner</string>
+    <string name="user_node_tag">tag</string>
+    <string name="shared_prefs_default">No flat yet</string>
+    <string name="error_blank_field">This field cannot be blank</string>
+    <string name="error_tag_exists">Tag already exists</string>
+
 </resources>

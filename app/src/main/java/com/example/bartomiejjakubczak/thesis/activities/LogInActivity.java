@@ -114,7 +114,6 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
                 if (!dataSnapshot.exists()) {
                     String dotlessEmail = userEmail.replaceAll("[\\s.]", "");
                     mUsersDatabaseReference.child(dotlessEmail).setValue(new User(userName, userSurname, userEmail));
-                    Log.d(TAG, getString(R.string.logs_user_created));
                 }
             }
 
