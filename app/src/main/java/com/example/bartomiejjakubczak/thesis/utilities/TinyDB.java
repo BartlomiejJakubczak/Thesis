@@ -437,7 +437,7 @@ public class TinyDB {
      */
     public void putString(String key, String value) {
         checkForNullKey(key); checkForNullValue(value);
-        preferences.edit().putString(key, value).apply();
+        preferences.edit().putString(key, value).commit();
     }
 
     /**
@@ -448,7 +448,7 @@ public class TinyDB {
     public void putListString(String key, ArrayList<String> stringList) {
         checkForNullKey(key);
         String[] myStringList = stringList.toArray(new String[stringList.size()]);
-        preferences.edit().putString(key, TextUtils.join("‚‗‚", myStringList)).apply();
+        preferences.edit().putString(key, TextUtils.join("‚‗‚", myStringList)).commit();
     }
 
     /**

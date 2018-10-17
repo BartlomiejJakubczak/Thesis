@@ -80,6 +80,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                 }
 
                 if (validAddress && validName) {
+                    createFlat.setEnabled(false);
                     createNewFlat(flatName.getText().toString().trim(), flatAddress.getText().toString().trim(), userDotlessEmail.trim());
                 }
 
@@ -196,6 +197,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), newFlat.getName());
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), newFlat.getAddress());
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key), newFlat.getKey());
+                            createFlat.setEnabled(true);
                             finish();
                         }
                     }

@@ -3,6 +3,7 @@ package com.example.bartomiejjakubczak.thesis.activities;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.Tag;
@@ -26,6 +27,7 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.dialogs.CreateFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.dialogs.DeleteFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.dialogs.SwitchFlatDialogFragment;
+import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.utilities.TinyDB;
@@ -40,7 +42,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection {
+public class MainActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection, DeleteDialogCloseListener {
 
     private static final String TAG = "MainActivity";
     private static Context context;
@@ -170,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
             }
 
             @Override
@@ -311,6 +312,25 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         FragmentManager fragmentManager = getFragmentManager();
         DialogFragment deleteFlatAlertDialog = new DeleteFlatDialogFragment();
         deleteFlatAlertDialog.show(fragmentManager, getString(R.string.tags_delete_flat_dialog));
+    }
+
+    @Override
+    public void handleDeleteDialogClose() {
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        TinyDB tinyDB = new TinyDB(getApplicationContext());
+        ArrayList<String> flatNames = tinyDB.getListString("shared_prefs_list_flat_names");
+        ArrayList<String> flatAddresses = tinyDB.getListString("shared_prefs_list_flat_addresses");
+        ArrayList<String> flatKeys = tinyDB.getListString("shared_prefs_list_flat_keys");
+        flatNames.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_name"));
+        flatAddresses.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_address"));
+        flatKeys.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_key"));
+        putStringToSharedPrefs(MainActivity.getContext(), "flat_name", flatNames.get(flatNames.size() - 1));
+        putStringToSharedPrefs(MainActivity.getContext(), "flat_address", flatAddresses.get(flatAddresses.size() - 1));
+        putStringToSharedPrefs(MainActivity.getContext(), "flat_key", flatKeys.get(flatKeys.size() - 1));
+        tinyDB.putListString("shared_prefs_list_flat_names", flatNames);
+        tinyDB.putListString("shared_prefs_list_flat_addresses", flatAddresses);
+        tinyDB.putListString("shared_prefs_list_flat_keys", flatKeys);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
     private void showSwitchFlatDialog() {

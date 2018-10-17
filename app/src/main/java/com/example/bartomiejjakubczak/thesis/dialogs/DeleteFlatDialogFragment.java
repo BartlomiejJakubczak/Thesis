@@ -1,5 +1,6 @@
 package com.example.bartomiejjakubczak.thesis.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
+import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.utilities.TinyDB;
@@ -60,7 +62,6 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
                         mFlatToDeleteDatabaseReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                setCurrentFlat();
                                 dismiss();
                             }
                         });
@@ -72,22 +73,6 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
                     }
                 });
         return builder.create();
-    }
-
-    private void setCurrentFlat() {
-        TinyDB tinyDB = new TinyDB(MainActivity.getContext());
-        ArrayList<String> flatNames = tinyDB.getListString("shared_prefs_list_flat_names");
-        ArrayList<String> flatAddresses = tinyDB.getListString("shared_prefs_list_flat_addresses");
-        ArrayList<String> flatKeys = tinyDB.getListString("shared_prefs_list_flat_keys");
-        flatNames.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_name"));
-        flatAddresses.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_address"));
-        flatKeys.remove(loadStringFromSharedPrefs(MainActivity.getContext(), "flat_key"));
-        putStringToSharedPrefs(MainActivity.getContext(), "flat_name", flatNames.get(flatNames.size() - 1));
-        putStringToSharedPrefs(MainActivity.getContext(), "flat_address", flatAddresses.get(flatAddresses.size() - 1));
-        putStringToSharedPrefs(MainActivity.getContext(), "flat_key", flatKeys.get(flatKeys.size() - 1));
-        tinyDB.putListString("shared_prefs_list_flat_names", flatNames);
-        tinyDB.putListString("shared_prefs_list_flat_addresses", flatAddresses);
-        tinyDB.putListString("shared_prefs_list_flat_keys", flatKeys);
     }
 
     @Override
@@ -113,7 +98,7 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
 
     @Override
     public void putStringToSharedPrefs(Context context, String label, String string) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).commit();
     }
 
     @Override
@@ -121,5 +106,10 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
         return PreferenceManager.getDefaultSharedPreferences(context).getString(label, "No flat yet");
     }
 
-
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        Activity activity = getActivity();
+        if (activity instanceof DeleteDialogCloseListener)
+            ((DeleteDialogCloseListener)activity).handleDeleteDialogClose();
+    }
 }
