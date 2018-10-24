@@ -41,5 +41,33 @@ FOR NEXT SESSION:
 - refactor shared prefs for clean code
 - deal with situation when user is deleting his last flat
 
-LONG TIME TO DO:
+-------------------------------------------------------------17.10.2018------------------------------------------------------------
+FOR NEXT SESSION:
+- implement flat searching in the FlatSearchFragment
+- implement requests
+
+-----------------------------------------------------------18.10.2018------------------------------------------------------------
+
+TO DO:
+- for switching flats pick only flats which belong to currently logged user
+
+
+-----------------------------------------------------------24.10.2018------------------------------------------------------------
+
+Now user can login from different accounts on the same smartphone.
+I should think of replacing information about all flats with something different or delete it entirely, because sharedprefs cant hold
+too much data. Then I should filter flats showing up in FlatSearchFragment to be only those which are not the currently selected user's and
+implement requests to join.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+ISSUES:
+- write notes about sharedPrefs (which does what) or refactor them
+- information about all flats shouldn't be stored in sharedPrefs, you have to change it
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)
+- deal with situation when user is deleting his last flat
+- deleting isnt complete yet, it wont delete flat node of user that is also in this flat
+- you have to change Dialogs from builders to onCreateViews in order to set setCanceledOnTouchOutside to false
+
+REMARKS:
+- think of changing all activities to fragments in the future

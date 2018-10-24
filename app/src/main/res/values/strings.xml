@@ -36,6 +36,7 @@
     <string name="drawer_menu_delete">Delete flat</string>
     <string name="drawer_menu_switch_flat">Switch current flat</string>
     <string name="drawer_menu_edit_profile">Edit profile</string>
+    <string name="drawer_menu_join_flat">Join existing flat</string>
     <string name="drawer_header_title">Name of flat</string>
     <string name="drawer_header_subtitle">Address of flat</string>
     <string name="shared_prefs_flat_name">flat_name</string>
@@ -47,12 +48,16 @@
     <string name="shared_prefs_list_flat_addresses">shared_prefs_list_flat_addresses</string>
     <string name="shared_prefs_list_flat_keys">shared_prefs_list_flat_keys</string>
     <string name="shared_prefs_list_flat_owners">shared_prefs_list_flat_owners</string>
+    <string name="shared_prefs_list_current_user_names">shared_prefs_list_current_user_names</string>
+    <string name="shared_prefs_list_current_user_addresses">shared_prefs_list_current_user_addresses</string>
+    <string name="shared_prefs_list_current_user_keys">shared_prefs_list_current_user_keys</string>
     <string name="delete_flat_dialog_negative">No</string>
     <string name="hint_profile_firstname">First name</string>
     <string name="label_first_name">First name</string>
     <string name="hint_profile_surname">Surname</string>
     <string name="label_surname">Surname</string>
     <string name="hint_profile_tag">Tag</string>
+    <string name="hint_flat_search">Search flats</string>
     <string name="label_tag">Tag</string>
     <string name="button_text_done_editing">Done</string>
     <string name="flat_node_name">name</string>

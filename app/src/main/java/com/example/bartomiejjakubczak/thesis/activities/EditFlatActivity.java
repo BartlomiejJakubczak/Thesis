@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -132,6 +133,7 @@ public class EditFlatActivity extends AppCompatActivity implements FirebaseConne
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mSearchedFlatDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats))
                 .child(loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key)));
+        Log.d(TAG, loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key)));
     }
 
     @Override

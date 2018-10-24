@@ -12,37 +12,36 @@ import com.example.bartomiejjakubczak.thesis.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlatsAdapter extends RecyclerView.Adapter<FlatsHolder> {
-
+public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearchFragmentHolder> {
     Context context;
     List<String> flatNames = new ArrayList<>();
     List<String> flatAddresses = new ArrayList<>();
-    List<String> flatKeys = new ArrayList<>();
+    List<String> flatOwners = new ArrayList<>();
 
-
-    public FlatsAdapter(Context context, List<String> flatNames, List<String> flatAddresses, List<String> flatKeys) {
+    public FlatsSearchFragmentAdapter(Context context, List<String> flatNames, List<String> flatAddresses, List<String> flatOwners) {
         this.context = context;
         this.flatNames = flatNames;
         this.flatAddresses = flatAddresses;
-        this.flatKeys = flatKeys;
+        this.flatOwners = flatOwners;
     }
 
     @NonNull
     @Override
-    public FlatsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.flat_model, parent, false);
-        return new FlatsHolder(view);
+    public FlatsSearchFragmentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.flat_search_model, parent, false);
+        return new FlatsSearchFragmentHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FlatsHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FlatsSearchFragmentHolder holder, int position) {
         holder.flatName.setText(flatNames.get(position));
         holder.flatAddress.setText(flatAddresses.get(position));
-        holder.flatKey = flatKeys.get(position);
+        holder.flatOwner.setText(flatOwners.get(position));
     }
 
     @Override
     public int getItemCount() {
         return flatNames.size();
     }
+
 }

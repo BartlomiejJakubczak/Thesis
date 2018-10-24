@@ -35,7 +35,7 @@ public class SwitchFlatDialogFragment extends DialogFragment implements SharedPr
     private static final String TAG = "SwitchDialogFragment";
     private List<String> flatNames = new ArrayList<>();
     private List<String> flatAddresses = new ArrayList<>();
-    private List<String> flatOwners = new ArrayList<>();
+    private List<String> flatKeys = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private FlatsAdapter flatsAdapter;
@@ -60,15 +60,16 @@ public class SwitchFlatDialogFragment extends DialogFragment implements SharedPr
         View rootView = inflater.inflate(R.layout.dialogfragment_switch_flat, container);
         recyclerView = rootView.findViewById(R.id.flat_switch_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        flatsAdapter = new FlatsAdapter(this.getActivity(), flatNames, flatAddresses, flatOwners);
+        flatsAdapter = new FlatsAdapter(this.getActivity(), flatNames, flatAddresses, flatKeys);
         recyclerView.setAdapter(flatsAdapter);
         return rootView;
     }
 
     private void fetchFlatsParameters() {
-        flatNames = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_names));
-        flatAddresses = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_addresses));
-        flatOwners = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_owners));
+        flatNames = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_names));
+        flatAddresses = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_addresses));
+        flatKeys = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_keys));
+        Log.d(TAG, flatNames + " " + flatAddresses);
     }
 
     @Override

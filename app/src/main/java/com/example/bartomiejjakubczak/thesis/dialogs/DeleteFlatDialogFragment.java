@@ -37,6 +37,7 @@ import java.util.List;
 public class DeleteFlatDialogFragment extends DialogFragment implements SharedPrefs, FirebaseConnection{
 
     private Context context;
+    private boolean noButton = false;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mFlatToDeleteDatabaseReference;
     private DatabaseReference mUserToDeleteFlatDatabaseReference;
@@ -70,6 +71,7 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
                 .setNegativeButton(getString(R.string.delete_flat_dialog_negative), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        noButton = true;
                     }
                 });
         return builder.create();
@@ -109,7 +111,7 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
     @Override
     public void onDismiss(DialogInterface dialog) {
         Activity activity = getActivity();
-        if (activity instanceof DeleteDialogCloseListener)
+        if (activity instanceof DeleteDialogCloseListener && !noButton)
             ((DeleteDialogCloseListener)activity).handleDeleteDialogClose();
     }
 }

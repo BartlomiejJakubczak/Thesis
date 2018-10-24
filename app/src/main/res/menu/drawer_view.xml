@@ -27,6 +27,12 @@
             android:title="@string/drawer_menu_switch_flat"
             android:checkable="false"/>
 
+        <item
+            android:id="@+id/nav_find_flat"
+            android:icon="@drawable/ic_group_add"
+            android:title="@string/drawer_menu_join_flat"
+            android:checkable="false"/>
+
     </group>
     <group
         android:id="@+id/Profile"
