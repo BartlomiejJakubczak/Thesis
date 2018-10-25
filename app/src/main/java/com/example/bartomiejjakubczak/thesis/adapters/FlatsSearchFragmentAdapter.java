@@ -3,26 +3,44 @@ package com.example.bartomiejjakubczak.thesis.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
+import com.example.bartomiejjakubczak.thesis.models.Flat;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearchFragmentHolder> {
     Context context;
-    List<String> flatNames = new ArrayList<>();
-    List<String> flatAddresses = new ArrayList<>();
-    List<String> flatOwners = new ArrayList<>();
+    private ArrayList<Flat> flats = new ArrayList<>();
+    private ArrayList<Flat> flatsCopy = new ArrayList<>();
 
-    public FlatsSearchFragmentAdapter(Context context, List<String> flatNames, List<String> flatAddresses, List<String> flatOwners) {
+    public FlatsSearchFragmentAdapter(Context context, ArrayList<Flat> flats, ArrayList<Flat> flatsCopy) {
         this.context = context;
-        this.flatNames = flatNames;
-        this.flatAddresses = flatAddresses;
-        this.flatOwners = flatOwners;
+        this.flats.addAll(flats);
+        this.flatsCopy.addAll(flatsCopy);
+    }
+
+    public void filter(String text) {
+        flats.clear();
+        if (text.isEmpty()) {
+           flats.addAll(flatsCopy);
+        } else {
+            text = text.toLowerCase().trim().replace(" ", "");
+            for (Flat flat: flatsCopy) {
+                String name = flat.getName().toLowerCase().trim().replace(" ", "");
+                String address = flat.getAddress().toLowerCase().trim().replace(" ", "");
+                String owner = flat.getOwner().toLowerCase().trim().replace(" ", "");
+                if (name.contains(text) || address.contains(text) || owner.contains(text)) {
+                    flats.add(flat);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -34,14 +52,14 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
 
     @Override
     public void onBindViewHolder(@NonNull FlatsSearchFragmentHolder holder, int position) {
-        holder.flatName.setText(flatNames.get(position));
-        holder.flatAddress.setText(flatAddresses.get(position));
-        holder.flatOwner.setText(flatOwners.get(position));
+        holder.flatName.setText(flats.get(position).getName());
+        holder.flatAddress.setText(flats.get(position).getAddress());
+        holder.flatOwner.setText(flats.get(position).getOwner());
     }
 
     @Override
     public int getItemCount() {
-        return flatNames.size();
+        return flats.size();
     }
 
 }

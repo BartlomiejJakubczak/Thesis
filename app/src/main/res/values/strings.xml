@@ -44,10 +44,6 @@
     <string name="shared_prefs_user_email">Current user email address without dots</string>
     <string name="shared_prefs_flat_key">flat_key</string>
     <string name="shared_prefs_flat_owner">flat_owner</string>
-    <string name="shared_prefs_list_flat_names">shared_prefs_list_flat_names</string>
-    <string name="shared_prefs_list_flat_addresses">shared_prefs_list_flat_addresses</string>
-    <string name="shared_prefs_list_flat_keys">shared_prefs_list_flat_keys</string>
-    <string name="shared_prefs_list_flat_owners">shared_prefs_list_flat_owners</string>
     <string name="shared_prefs_list_current_user_names">shared_prefs_list_current_user_names</string>
     <string name="shared_prefs_list_current_user_addresses">shared_prefs_list_current_user_addresses</string>
     <string name="shared_prefs_list_current_user_keys">shared_prefs_list_current_user_keys</string>

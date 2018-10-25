@@ -13,13 +13,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
@@ -60,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedUserReference;
-    private DatabaseReference mSearchedUserFlatsReference;
+    private DatabaseReference mSearchedUserFlatsDatabaseReference;
     private DatabaseReference mUsersFlatsDatabaseReference;
     private DatabaseReference mFlatsDatabaseReference;
 
@@ -236,30 +234,16 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         }
     }
 
-    private void setCurrentFlat() {
-        setAllFlatsSharedPrefs();
-        setCurrentUserFlatsSharedPrefs();
-    }
+    private void setCurrentUserFlatsPrefs() {
 
-    private void setAllFlatsSharedPrefs() {
-        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
+
+        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final ArrayList<String> keys = new ArrayList<>();
-                final ArrayList<String> names = new ArrayList<>();
-                final ArrayList<String> addresses = new ArrayList<>();
-                final ArrayList<String> owners = new ArrayList<>();
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    names.add(ds.child(getString(R.string.flat_node_name)).getValue().toString());
-                    addresses.add(ds.child(getString(R.string.flat_node_address)).getValue().toString());
-                    keys.add(ds.child(getString(R.string.flat_node_key)).getValue().toString());
-                    owners.add(ds.child(getString(R.string.flat_node_owner)).getValue().toString());
+                    currentSearchedUserFlatsKeys.add(ds.getKey());
                 }
-                tinyDB.putListString(getString(R.string.shared_prefs_list_flat_names), names);
-                tinyDB.putListString(getString(R.string.shared_prefs_list_flat_addresses), addresses);
-                tinyDB.putListString(getString(R.string.shared_prefs_list_flat_keys), keys);
-                tinyDB.putListString(getString(R.string.shared_prefs_list_flat_owners), owners);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             }
 
             @Override
@@ -267,9 +251,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
             }
         });
-    }
 
-    private void setCurrentUserFlatsSharedPrefs() {
+
         mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -277,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 final ArrayList<String> currentUserFlatsNames = new ArrayList<>();
                 final ArrayList<String> currentUserFlatsAddresses = new ArrayList<>();
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (ds.child("owner").getValue().equals(currentUserEmail)) {
+                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
                         currentUserFlatsKeys.add(ds.child("key").getValue().toString());
                         currentUserFlatsNames.add(ds.child("name").getValue().toString());
                         currentUserFlatsAddresses.add(ds.child("address").getValue().toString());
@@ -292,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_names), currentUserFlatsNames);
                 tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_addresses), currentUserFlatsAddresses);
                 tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_keys), currentUserFlatsKeys);
-                Log.d(TAG, "keys: " + currentUserFlatsKeys + "names: " + currentUserFlatsNames + "addresses: " + currentUserFlatsAddresses);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             }
 
@@ -335,37 +317,9 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         TinyDB tinyDB = new TinyDB(getApplicationContext());
 
-        ArrayList<String> flatNames = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_names));
-        ArrayList<String> flatAddresses = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_addresses));
-        ArrayList<String> flatKeys = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_keys));
-        ArrayList<String> flatOwners = tinyDB.getListString(getString(R.string.shared_prefs_list_flat_owners));
-
         ArrayList<String> ownerFlatNames = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_names));
         ArrayList<String> ownerFlatAddresses = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_addresses));
         ArrayList<String> ownerFlatKeys = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_keys));
-
-        Log.d(TAG, "AFTER DELETION:\n " +
-                "ALL FLATS" + flatKeys
-                + "\n"
-                + flatNames
-                + "\n"
-                + flatAddresses
-                + "\n"
-                + flatOwners
-                + "USER FLATS INFO:\n"
-                + ownerFlatKeys
-                + "\n"
-                + ownerFlatNames
-                + "\n"
-                + ownerFlatAddresses
-                + "CURRENTLY SELECTED FLAT:\n"
-                + loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name))
-                + "\n" + loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address)));
-
-        flatNames.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name)));
-        flatAddresses.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address)));
-        flatKeys.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key)));
-        flatOwners.remove(currentUserEmail);
 
         ownerFlatNames.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name)));
         ownerFlatAddresses.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address)));
@@ -375,32 +329,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ownerFlatAddresses.get(ownerFlatAddresses.size() - 1));
         putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ownerFlatKeys.get(ownerFlatKeys.size() - 1));
 
-        tinyDB.putListString(getString(R.string.shared_prefs_list_flat_names), flatNames);
-        tinyDB.putListString(getString(R.string.shared_prefs_list_flat_addresses), flatAddresses);
-        tinyDB.putListString(getString(R.string.shared_prefs_list_flat_keys), flatKeys);
-        tinyDB.putListString(getString(R.string.shared_prefs_list_flat_owners), flatOwners);
-
         tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_names), ownerFlatNames);
         tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_addresses), ownerFlatAddresses);
         tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_keys), ownerFlatKeys);
 
-        Log.d(TAG, "AFTER DELETION:\n " +
-                "ALL FLATS" + flatKeys
-                + "\n"
-                + flatNames
-                + "\n"
-                + flatAddresses
-                + "\n"
-                + flatOwners
-                + "USER FLATS INFO:\n"
-                + ownerFlatKeys
-                + "\n"
-                + ownerFlatNames
-                + "\n"
-                + ownerFlatAddresses
-                + "CURRENTLY SELECTED FLAT:\n"
-                + loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name))
-                + "\n" + loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address)));
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
@@ -417,14 +349,14 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     private void decideToShowCreateFlatDialog() {
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        mSearchedUserFlatsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
                     showCreateFlatDialog();
                     mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 } else {
-                    setCurrentFlat();
+                    setCurrentUserFlatsPrefs();
                 }
             }
 
@@ -446,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         DatabaseReference mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
         mSearchedUserReference = mUsersDatabaseReference.child(dotlessEmail);
         mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
-        mSearchedUserFlatsReference = mUsersFlatsDatabaseReference.child(dotlessEmail);
+        mSearchedUserFlatsDatabaseReference = mUsersFlatsDatabaseReference.child(dotlessEmail);
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
     }
 
