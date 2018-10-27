@@ -17,8 +17,10 @@ import android.view.ViewGroup;
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.adapters.FlatsAdapter;
+import com.example.bartomiejjakubczak.thesis.adapters.FlatsSearchFragmentAdapter;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.example.bartomiejjakubczak.thesis.utilities.TinyDB;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,25 +35,59 @@ import java.util.List;
 public class SwitchFlatDialogFragment extends DialogFragment implements SharedPrefs, FirebaseConnection {
 
     private static final String TAG = "SwitchDialogFragment";
-    private List<String> flatNames = new ArrayList<>();
-    private List<String> flatAddresses = new ArrayList<>();
-    private List<String> flatKeys = new ArrayList<>();
+    private ArrayList<Flat> flats = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private FlatsAdapter flatsAdapter;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mFlatsDatabaseReference;
+    private DatabaseReference mSearchedUserFlatsDatabaseReference;
 
-    private TinyDB tinyDB;
+    private void loadFlatsInformation() {
+        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
+        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    currentSearchedUserFlatsKeys.add(ds.getKey());
+                }
+                Log.d(TAG, currentSearchedUserFlatsKeys.get(0));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
+                        flats.add(new Flat(ds.child("name").getValue().toString(),
+                                ds.child("address").getValue().toString(),
+                                ds.child("owner").getValue().toString(),
+                                ds.child("key").getValue().toString()));
+                    }
+                }
+                flatsAdapter = new FlatsAdapter(MainActivity.getContext(), flats);
+                recyclerView.setAdapter(flatsAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tinyDB = new TinyDB(MainActivity.getContext());
         initializeFirebaseComponents();
         initializeFirebaseDatabaseReferences(FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", ""));
-        fetchFlatsParameters();
     }
 
     @Nullable
@@ -60,16 +96,8 @@ public class SwitchFlatDialogFragment extends DialogFragment implements SharedPr
         View rootView = inflater.inflate(R.layout.dialogfragment_switch_flat, container);
         recyclerView = rootView.findViewById(R.id.flat_switch_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        flatsAdapter = new FlatsAdapter(this.getActivity(), flatNames, flatAddresses, flatKeys);
-        recyclerView.setAdapter(flatsAdapter);
+        loadFlatsInformation();
         return rootView;
-    }
-
-    private void fetchFlatsParameters() {
-        flatNames = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_names));
-        flatAddresses = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_addresses));
-        flatKeys = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_keys));
-        Log.d(TAG, flatNames + " " + flatAddresses);
     }
 
     @Override
@@ -90,5 +118,8 @@ public class SwitchFlatDialogFragment extends DialogFragment implements SharedPr
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
+        mSearchedUserFlatsDatabaseReference = mFirebaseDatabase.getReference()
+                .child(getString(R.string.firebase_reference_user_flats))
+                .child(dotlessEmail);
     }
 }

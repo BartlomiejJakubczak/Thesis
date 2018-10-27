@@ -90,7 +90,8 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
                     if (!currentSearchedUserFlatsKeys.contains(ds.getKey())) {
                         flats.add(new Flat(ds.child("name").getValue().toString(),
                                 ds.child("address").getValue().toString(),
-                                ds.child("owner").getValue().toString()));
+                                ds.child("owner").getValue().toString(),
+                                ds.child("key").getValue().toString()));
                     }
                 }
                 flatsCopy.addAll(flats);

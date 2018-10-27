@@ -16,6 +16,13 @@ public class Flat {
         this.owner = ownerEmailAddress;
     }
 
+    public Flat(String name, String address, String ownerEmailAddress, String key) {
+        this.name = name;
+        this.address = address;
+        this.key = key;
+        this.owner = ownerEmailAddress;
+    }
+
     public String getName() {
         return name;
     }

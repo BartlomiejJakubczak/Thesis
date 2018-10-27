@@ -21,13 +21,18 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.adapters.FlatsSearchFragmentAdapter;
 import com.example.bartomiejjakubczak.thesis.dialogs.CreateFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.dialogs.DeleteFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.dialogs.SwitchFlatDialogFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
 import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.example.bartomiejjakubczak.thesis.utilities.TinyDB;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -51,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
 
-    private TinyDB tinyDB;
-
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
@@ -66,8 +69,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
-        tinyDB = new TinyDB(getApplicationContext());
-
         initializeFirebaseComponents();
         setContentView(R.layout.activity_main);
         setViews();
@@ -141,39 +142,43 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.nav_create_flat:
-                        Intent intent = new Intent(getApplicationContext(), CreateFlatActivity.class);
-                        startActivity(intent);
-                        mDrawerLayout.closeDrawer(Gravity.START, false);
+                        FragmentManager createFragmentManager = getFragmentManager();
+                        FragmentTransaction createFragmentTransaction = createFragmentManager.beginTransaction();
+                        CreateFlatFragment flatCreateFragment = new CreateFlatFragment();
+                        createFragmentTransaction.add(R.id.fragment_placeholder, flatCreateFragment, "flatCreateFragment");
+                        createFragmentTransaction.commit();
+                        mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_delete_flat:
-                        if (tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_names)).size() - 1 != 0) {
-                            showDeleteFlatDialog();
-                            mDrawerLayout.closeDrawer(Gravity.START, false);
-                            return true;
-                        } else {
-                            //TODO dialog which informs you are about to delete the last flat, delete the flat from db and pop createdialog
-                        }
+                        showDeleteFlatDialog();
+                        mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_edit_profile:
-                        Intent intentEditProfile = new Intent(getApplicationContext(), EditProfileActivity.class);
-                        startActivity(intentEditProfile);
-                        mDrawerLayout.closeDrawer(Gravity.START, false);
+                        FragmentManager editProfileFragmentManager = getFragmentManager();
+                        FragmentTransaction editProfileFragmentTransaction = editProfileFragmentManager.beginTransaction();
+                        EditProfileFragment editProfileFragment = new EditProfileFragment();
+                        editProfileFragmentTransaction.add(R.id.fragment_placeholder, editProfileFragment, "profileEditFragment");
+                        editProfileFragmentTransaction.commit();
+                        mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_edit_flat:
-                        Intent intentEditFlat = new Intent(getApplicationContext(), EditFlatActivity.class);
-                        startActivity(intentEditFlat);
-                        mDrawerLayout.closeDrawer(Gravity.START, false);
+                        FragmentManager editFragmentManager = getFragmentManager();
+                        FragmentTransaction editFragmentTransaction = editFragmentManager.beginTransaction();
+                        EditFlatFragment flatEditFragment = new EditFlatFragment();
+                        editFragmentTransaction.add(R.id.fragment_placeholder, flatEditFragment, "flatEditFragment");
+                        editFragmentTransaction.commit();
+                        mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_switch_flat:
                         showSwitchFlatDialog();
                         mDrawerLayout.closeDrawer(Gravity.START, false);
                         return true;
                     case R.id.nav_find_flat:
-                        FragmentManager fragmentManager = getFragmentManager();
-                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        FragmentManager findFragmentManager = getFragmentManager();
+                        FragmentTransaction findFragmentTransaction = findFragmentManager.beginTransaction();
                         FlatSearchFragment flatSearchFragment = new FlatSearchFragment();
-                        fragmentTransaction.add(R.id.fragment_placeholder, flatSearchFragment, "flatSearchFragment");
-                        fragmentTransaction.commit();
+                        findFragmentTransaction.add(R.id.fragment_placeholder, flatSearchFragment, "flatSearchFragment");
+                        findFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                 }
@@ -225,64 +230,71 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     }
 
     private void resetFragments() {
+        CreateFlatFragment createFlatFragment = (CreateFlatFragment) getFragmentManager().findFragmentByTag("flatCreateFragment");
         FlatSearchFragment flatSearchFragment = (FlatSearchFragment) getFragmentManager().findFragmentByTag("flatSearchFragment");
+        EditFlatFragment editFlatFragment = (EditFlatFragment) getFragmentManager().findFragmentByTag("flatEditFragment");
+        EditProfileFragment editProfileFragment = (EditProfileFragment) getFragmentManager().findFragmentByTag("profileEditFragment");
+
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(flatSearchFragment);
             fragmentTransaction.commit();
+        } else if (createFlatFragment != null && createFlatFragment.isVisible()) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(createFlatFragment);
+            fragmentTransaction.commit();
+        } else if (editFlatFragment != null && editFlatFragment.isVisible()) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(editFlatFragment);
+            fragmentTransaction.commit();
+        } else if (editProfileFragment != null && editProfileFragment.isVisible()) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(editProfileFragment);
+            fragmentTransaction.commit();
         }
     }
 
     private void setCurrentUserFlatsPrefs() {
-
         final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
-
-        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    currentSearchedUserFlatsKeys.add(ds.getKey());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final ArrayList<String> currentUserFlatsKeys = new ArrayList<>();
-                final ArrayList<String> currentUserFlatsNames = new ArrayList<>();
-                final ArrayList<String> currentUserFlatsAddresses = new ArrayList<>();
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
-                        currentUserFlatsKeys.add(ds.child("key").getValue().toString());
-                        currentUserFlatsNames.add(ds.child("name").getValue().toString());
-                        currentUserFlatsAddresses.add(ds.child("address").getValue().toString());
+        String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
+        if (currentFlatName.isEmpty() || currentFlatName.equals("No flat yet")) {
+            mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                        currentSearchedUserFlatsKeys.add(ds.getKey());
                     }
                 }
-                String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
-                if (currentFlatName.isEmpty() || currentFlatName.equals("No flat yet")) {
-                    putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), currentUserFlatsNames.get(0));
-                    putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), currentUserFlatsAddresses.get(0));
-                    putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key), currentUserFlatsKeys.get(0));
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
-                tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_names), currentUserFlatsNames);
-                tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_addresses), currentUserFlatsAddresses);
-                tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_keys), currentUserFlatsKeys);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            }
+            });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                        if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
+                            putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ds.child("name").getValue().toString());
+                            putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ds.child("address").getValue().toString());
+                            putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ds.child("key").getValue().toString());
+                            break;
+                        }
+                    }
+                    mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                }
 
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 
     /**
@@ -314,24 +326,44 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     @Override
     public void handleDeleteDialogClose() {
+
+        //TODO HANDLE THE SITUATION WHEN USER IS DELETING HIS LAST FLAT
+
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        TinyDB tinyDB = new TinyDB(getApplicationContext());
 
-        ArrayList<String> ownerFlatNames = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_names));
-        ArrayList<String> ownerFlatAddresses = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_addresses));
-        ArrayList<String> ownerFlatKeys = tinyDB.getListString(getString(R.string.shared_prefs_list_current_user_keys));
+        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
+        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    currentSearchedUserFlatsKeys.add(ds.getKey());
+                }
+            }
 
-        ownerFlatNames.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name)));
-        ownerFlatAddresses.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address)));
-        ownerFlatKeys.remove(loadStringFromSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key)));
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ownerFlatNames.get(ownerFlatNames.size() - 1));
-        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ownerFlatAddresses.get(ownerFlatAddresses.size() - 1));
-        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ownerFlatKeys.get(ownerFlatKeys.size() - 1));
+            }
+        });
 
-        tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_names), ownerFlatNames);
-        tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_addresses), ownerFlatAddresses);
-        tinyDB.putListString(getString(R.string.shared_prefs_list_current_user_keys), ownerFlatKeys);
+        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
+                        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ds.child("name").getValue().toString());
+                        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ds.child("address").getValue().toString());
+                        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ds.child("key").getValue().toString());
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }

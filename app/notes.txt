@@ -66,6 +66,7 @@ implement requests to join.
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
+- hitting button instead of slider at the beggining locks the drawer
 - create a refresh button for flat searching fragment
 - make CreateFlatDialog dissapear proof or think of another way for the user to create/join flat (in case he chooses join and requests,
   pop a window which will inform him that he has to wait for verdict of owner in order to further use app
@@ -76,6 +77,3 @@ ISSUES:
 - deal with situation when user is deleting his last flat
 - deleting isnt complete yet, it wont delete flat node of user that is also in this flat
 - you have to change Dialogs from builders to onCreateViews in order to set setCanceledOnTouchOutside to false
-
-REMARKS:
-- think of changing all activities to fragments in the future

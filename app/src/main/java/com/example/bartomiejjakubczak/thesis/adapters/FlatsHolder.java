@@ -27,6 +27,7 @@ public class FlatsHolder extends RecyclerView.ViewHolder implements SharedPrefs 
                 putStringToSharedPrefs(MainActivity.getContext(), "flat_name", flatName.getText().toString());
                 putStringToSharedPrefs(MainActivity.getContext(), "flat_address", flatAddress.getText().toString());
                 putStringToSharedPrefs(MainActivity.getContext(), "flat_key", flatKey);
+                Log.d("FlatsHolder", flatKey + " " + flatName.getText().toString());
             }
         });
     }

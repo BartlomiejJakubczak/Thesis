@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.models.Flat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +16,12 @@ import java.util.List;
 public class FlatsAdapter extends RecyclerView.Adapter<FlatsHolder> {
 
     Context context;
-    List<String> flatNames = new ArrayList<>();
-    List<String> flatAddresses = new ArrayList<>();
-    List<String> flatKeys = new ArrayList<>();
+    private ArrayList<Flat> flats = new ArrayList<>();
 
 
-    public FlatsAdapter(Context context, List<String> flatNames, List<String> flatAddresses, List<String> flatKeys) {
+    public FlatsAdapter(Context context, ArrayList<Flat> flats) {
         this.context = context;
-        this.flatNames = flatNames;
-        this.flatAddresses = flatAddresses;
-        this.flatKeys = flatKeys;
+        this.flats.addAll(flats);
     }
 
     @NonNull
@@ -36,13 +33,13 @@ public class FlatsAdapter extends RecyclerView.Adapter<FlatsHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull FlatsHolder holder, int position) {
-        holder.flatName.setText(flatNames.get(position));
-        holder.flatAddress.setText(flatAddresses.get(position));
-        holder.flatKey = flatKeys.get(position);
+        holder.flatName.setText(flats.get(position).getName());
+        holder.flatAddress.setText(flats.get(position).getAddress());
+        holder.flatKey = flats.get(position).getKey();
     }
 
     @Override
     public int getItemCount() {
-        return flatNames.size();
+        return flats.size();
     }
 }
