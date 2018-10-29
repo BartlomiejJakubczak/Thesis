@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +42,7 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedUserFlatsDatabaseReference;
     private DatabaseReference mFlatsDatabaseReference;
-
-    private TinyDB tinyDB;
+    private DatabaseReference mCurrentUserRequestsDatabaseReference;
 
     @Nullable
     @Override
@@ -53,7 +53,6 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tinyDB = new TinyDB(MainActivity.getContext());
         initializeFirebaseComponents();
         initializeFirebaseDatabaseReferences(FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", ""));
     }
@@ -68,12 +67,28 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
     }
 
     private void loadFlatsInformation() {
+        final ArrayList<String> sentRequestFlatsKeys = new ArrayList<>();
         final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
         mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     currentSearchedUserFlatsKeys.add(ds.getKey());
+                    Log.d("FlatSearchFragment", currentSearchedUserFlatsKeys.toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mCurrentUserRequestsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    sentRequestFlatsKeys.add(ds.child("flatInvolved").getValue().toString());
                 }
             }
 
@@ -87,7 +102,7 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (!currentSearchedUserFlatsKeys.contains(ds.getKey())) {
+                    if (!currentSearchedUserFlatsKeys.contains(ds.getKey()) && !sentRequestFlatsKeys.contains(ds.getKey())) {
                         flats.add(new Flat(ds.child("name").getValue().toString(),
                                 ds.child("address").getValue().toString(),
                                 ds.child("owner").getValue().toString(),
@@ -135,5 +150,6 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
                 .child(getString(R.string.firebase_reference_user_flats))
                 .child(dotlessEmail);
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
+        mCurrentUserRequestsDatabaseReference = mFirebaseDatabase.getReference().child("sentRequests").child(dotlessEmail);
     }
 }

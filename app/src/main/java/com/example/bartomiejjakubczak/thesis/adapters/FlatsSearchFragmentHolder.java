@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 
 public class FlatsSearchFragmentHolder extends RecyclerView.ViewHolder {
 
