@@ -82,9 +82,16 @@ Maybe don't add personInvolvedTag as a variable in notifications and draw this i
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------02.11.2018------------------------------------------------------------
+
+I found solution to home button problem, i assigned toolbar as a member field and then i use mActionBar.setDisplayHomeAsUpEnabled from it,
+maybe it could be shared throughout all project, which would bring end to "no flat yet" problem. I fixed database relations, but in case
+of notifications i still think they need some work. As of nw, requests show properly, now I need to implement accepting/denying user
+(might involve relations fixing)
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 ISSUES:
-- editing tags doesnt work properly, whole rework is necessary
-- when loading info at the beggining of the app disable the button
 - when changing somethingin fragments like edit profile try to disable drawer until all info is loaded (maybe)
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - make CreateFlatDialog dissapear proof or think of another way for the user to create/join flat (in case he chooses join and requests,

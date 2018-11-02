@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
+    private ActionBar mActionBar;
     private DrawerLayout.DrawerListener mDrawerListener;
 
     private FirebaseAuth mFirebaseAuth;
@@ -148,8 +149,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     private void setDrawer() {
         setSupportActionBar(mToolbar);
-        ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(false);
         mActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -311,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         }
                     }
                     mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                    mActionBar.setDisplayHomeAsUpEnabled(true);
                 }
 
                 @Override
@@ -320,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             });
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -354,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     public void handleDeleteDialogClose() {
 
         //TODO HANDLE THE SITUATION WHEN USER IS DELETING HIS LAST FLAT
-
+        mActionBar.setDisplayHomeAsUpEnabled(false);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
@@ -380,6 +383,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ds.child("name").getValue().toString());
                         putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ds.child("address").getValue().toString());
                         putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ds.child("key").getValue().toString());
+                        mActionBar.setDisplayHomeAsUpEnabled(true);
+                        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                         break;
                     }
                 }
@@ -390,8 +395,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
             }
         });
-
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
     private void showSwitchFlatDialog() {
@@ -425,6 +428,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 if (!dataSnapshot.exists()) {
                     showCreateFlatDialog();
                     mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                    mActionBar.setDisplayHomeAsUpEnabled(true);
                 } else {
                     setCurrentUserFlatsPrefs();
                 }
