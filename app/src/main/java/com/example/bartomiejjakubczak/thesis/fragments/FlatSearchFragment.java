@@ -87,7 +87,7 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    sentRequestFlatsKeys.add(ds.child("flatInvolved").getValue().toString());
+                    sentRequestFlatsKeys.add(ds.child("flatInvolvedKey").getValue().toString());
                 }
             }
 
@@ -150,6 +150,6 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
                 .child(getString(R.string.firebase_reference_user_flats))
                 .child(dotlessEmail);
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
-        mCurrentUserRequestsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child(dotlessEmail).child("sentNotifications");
+        mCurrentUserRequestsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("sentNotifications");
     }
 }

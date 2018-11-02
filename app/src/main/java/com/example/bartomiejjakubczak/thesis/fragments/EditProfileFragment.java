@@ -18,9 +18,6 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
-import com.example.bartomiejjakubczak.thesis.models.Flat;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,10 +31,10 @@ import java.util.List;
 public class EditProfileFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
     private static final String TAG = "EditProfileFragment";
+    private final String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     private String oldTag;
     private List<String> parameters = new ArrayList<>();
-    private boolean validTagEmpty = false;
-    private boolean validTagDuplicate = false;
+    private boolean validTagDuplicate = true;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseDatabase mFirebaseDatabase;
@@ -45,7 +42,7 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
     private DatabaseReference mUserDatabaseReference;
     private DatabaseReference mSearchedUserFlatsDatabaseReference;
     private DatabaseReference mFlatsDatabaseReference;
-    private DatabaseReference mSearchedUserNotificationsDatabaseReference;
+    private DatabaseReference mReceivedNotificationsDatabaseReference;
 
     private EditText tag;
     private Button doneButton;
@@ -53,6 +50,7 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
     private View setViews(LayoutInflater inflater, ViewGroup container) {
         final View view = inflater.inflate(R.layout.activity_edit_profile, container, false);
         tag = view.findViewById(R.id.edit_flat_name);
+        setEditTexts();
         doneButton = view.findViewById(R.id.edit_profile_button);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +61,6 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
                 checkIfCorrectTag(newTag);
             }
         });
-        setEditTexts();
         return view;
     }
 
@@ -88,10 +85,10 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
 
     private void checkIfCorrectTag(String newTag) {
         if (checkIfEmpty(newTag)) {
-            validTagEmpty = false;
-            verdictTag(newTag);
+            tag.setError(getString(R.string.error_blank_field));
+            tag.setText(oldTag);
+            tag.setHintTextColor(getResources().getColor(R.color.red));
         } else {
-            validTagEmpty = true;
             checkIfDuplicate(newTag);
         }
     }
@@ -105,97 +102,49 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
         mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()){
-                    if (ds.child(getString(R.string.user_node_tag)).getValue().toString().equals(newTag)) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (ds.child("tag").getValue().toString().equals(newTag)) {
                         validTagDuplicate = false;
-                    } else {
-                        validTagDuplicate = true;
-                    }
-                    verdictTag(newTag);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void verdictTag(String newTag) {
-        if (!validTagEmpty) {
-            tag.setError(getString(R.string.error_blank_field));
-            tag.setText(oldTag);
-            tag.setHintTextColor(getResources().getColor(R.color.red));
-            tag.requestFocus();
-        } else {
-            if (!validTagDuplicate) {
-                tag.setError(getString(R.string.error_tag_exists));
-                tag.setText(oldTag);
-                tag.setHintTextColor(getResources().getColor(R.color.red));
-                tag.requestFocus();
-            } else {
-                updateTag(newTag);
-            }
-        }
-    }
-
-    private void updateTag(final String newTag) {
-        doneButton.setEnabled(false);
-        putStringToSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag", newTag);
-        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
-        mSearchedUserDatabaseReference.child(getString(R.string.user_node_tag)).setValue(newTag.trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                //TODO toast maybe? think of a way to inform user about completion
-                doneButton.setEnabled(true);
-            }
-        });
-        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    currentSearchedUserFlatsKeys.add(ds.getKey());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
-                        mFlatsDatabaseReference.child(ds.getKey()).child("ownerTag").setValue(newTag);
+                        tag.setError(getString(R.string.error_tag_exists));
+                        tag.setText(oldTag);
+                        tag.setHintTextColor(getResources().getColor(R.color.red));
                     }
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        mSearchedUserNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot dsEmails: dataSnapshot.getChildren()) {
-                    for (DataSnapshot dsSentReceivedNotifications: dsEmails.getChildren()) {
-                        for (DataSnapshot dsNotificationKeys: dsSentReceivedNotifications.getChildren()) {
-                            if (dsNotificationKeys.child("personInvolvedTag").getValue().toString().equals(oldTag)) {
-                                mSearchedUserNotificationsDatabaseReference
-                                        .child(dsEmails.getKey())
-                                        .child(dsSentReceivedNotifications.getKey())
-                                        .child(dsNotificationKeys.getKey())
-                                        .child("personInvolvedTag")
-                                        .setValue(newTag);
+                if (validTagDuplicate) {
+                    doneButton.setEnabled(false);
+                    putStringToSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag", newTag);
+                    mUserDatabaseReference.child(currentUserEmail).child("tag").setValue(newTag);
+                    mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                                if (ds.child("ownerTag").getValue().toString().equals(oldTag)) {
+                                    mFlatsDatabaseReference.child(ds.getKey()).child("ownerTag").setValue(newTag);
+                                }
                             }
-                            Log.d(TAG, dsNotificationKeys.child("personInvolvedTag").getValue().toString());
                         }
-                    }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                    mReceivedNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                                if (ds.child("personInvolvedTag").getValue().toString().equals(oldTag)) {
+                                    mReceivedNotificationsDatabaseReference.child(ds.getKey()).child("personInvolvedTag").setValue(newTag);
+                                    doneButton.setEnabled(true);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
 
@@ -204,7 +153,6 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
 
             }
         });
-        oldTag = newTag;
     }
 
     @Override
@@ -232,7 +180,7 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
         mUserDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
         mSearchedUserFlatsDatabaseReference = mFirebaseDatabase.getReference().child("userFlats").child(dotlessEmail);
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child("flats");
-        mSearchedUserNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications");
+        mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("receivedNotifications");
     }
 
     @Override

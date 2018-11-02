@@ -1,6 +1,7 @@
 package com.example.bartomiejjakubczak.thesis.adapters;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
+import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,7 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearchFragmentHolder> implements FirebaseConnection {
+public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearchFragmentHolder> implements FirebaseConnection, SharedPrefs {
 
     private final Context context;
     private String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
@@ -79,10 +81,9 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
     @Override
     public void onBindViewHolder(@NonNull final FlatsSearchFragmentHolder holder, int position) {
         final String flatOwnerKey = flats.get(position).getOwner();
-        final String flatOwnerTag = flats.get(position).getOwnerTag();
         final String flatKey = flats.get(position).getKey();
         final String flatName = flats.get(position).getName();
-        final String[] senderTag = new String[1];
+        final String senderTag = loadStringFromSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag");
 
         holder.flatName.setText(flats.get(position).getName());
         holder.flatAddress.setText(flats.get(position).getAddress());
@@ -91,10 +92,11 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
             @Override
             public void onClick(View v) {
                 holder.requestJoin.setEnabled(false);
+
                 mRequestSenderDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, flatOwnerTag, flatKey, flatName);
+                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", userDotlessEmail, flatKey);
                         mRequestSenderDatabaseReference.child(requestJoinNotification.getKey()).setValue(requestJoinNotification);
                     }
 
@@ -104,23 +106,11 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                     }
                 });
 
-                mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                mRequestReceiverDatabaseReference.child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        senderTag[0] = dataSnapshot.getValue().toString();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-                mRequestReceiverDatabaseReference.child(flatOwnerKey).child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", userDotlessEmail, senderTag[0], flatKey, flatName);
-                        mRequestReceiverDatabaseReference.child(flatOwnerKey).child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, senderTag, flatKey, flatName);
+                        mRequestReceiverDatabaseReference.child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 removeAt(holder.getAdapterPosition());
@@ -150,8 +140,18 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
 
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-        mRequestSenderDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child(dotlessEmail).child("sentNotifications");
+        mRequestSenderDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("sentNotifications");
         mRequestReceiverDatabaseReference = mFirebaseDatabase.getReference().child("notifications");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users").child(dotlessEmail).child("tag");
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, "No flat yet");
     }
 }

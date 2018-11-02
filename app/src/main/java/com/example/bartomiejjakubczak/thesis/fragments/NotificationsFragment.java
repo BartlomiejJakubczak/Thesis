@@ -53,15 +53,17 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     switch (ds.child("topic").getValue().toString()) {
                         case "Join flat":
-                            final RequestJoinNotification requestJoinNotification = new RequestJoinNotification(
-                                    ds.child("topic").getValue().toString(),
-                                    ds.child("personInvolvedKey").getValue().toString(),
-                                    ds.child("personInvolvedTag").getValue().toString(),
-                                    ds.child("flatInvolvedKey").getValue().toString(),
-                                    ds.child("flatInvolvedName").getValue().toString(),
-                                    ds.child("key").getValue().toString()
-                            );
-                            receivedNotifications.add(requestJoinNotification);
+                            if (ds.child("personInvolvedKey").getValue().toString().equals(userDotlessEmail)) {
+                                final RequestJoinNotification requestJoinNotification = new RequestJoinNotification(
+                                        ds.child("topic").getValue().toString(),
+                                        ds.child("personInvolvedKey").getValue().toString(),
+                                        ds.child("personInvolvedTag").getValue().toString(),
+                                        ds.child("flatInvolvedKey").getValue().toString(),
+                                        ds.child("flatInvolvedName").getValue().toString(),
+                                        ds.child("key").getValue().toString()
+                                );
+                                receivedNotifications.add(requestJoinNotification);
+                            }
                     }
                 }
                 receivedNotificationsCopy.addAll(receivedNotifications);
@@ -97,7 +99,7 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
 
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-        mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child(dotlessEmail).child("receivedNotifications");
+        mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("receivedNotifications");
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child("flats");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
     }

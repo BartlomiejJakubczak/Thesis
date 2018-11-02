@@ -31,6 +31,13 @@ public class RequestJoinNotification implements ListNotifications {
         this.key = key;
     }
 
+    public RequestJoinNotification(String topic, String personInvolvedKey, String flatInvolvedKey) {
+        this.key = generateKey();
+        this.topic = topic;
+        this.flatInvolvedKey = flatInvolvedKey;
+        this.personInvolvedKey = personInvolvedKey;
+    }
+
     public String getTopic() {
         return topic;
     }

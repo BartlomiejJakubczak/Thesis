@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private DatabaseReference mSearchedUserFlatsDatabaseReference;
     private DatabaseReference mUsersFlatsDatabaseReference;
     private DatabaseReference mFlatsDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -407,6 +408,17 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private void decideToShowCreateFlatDialog() {
         Log.d(TAG, "decideToShowCreateFlatDialog was called");
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mUsersDatabaseReference.child(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                putStringToSharedPrefs(getApplicationContext(), "shared_prefs_user_tag", dataSnapshot.child("tag").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -433,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-        DatabaseReference mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
         mSearchedUserReference = mUsersDatabaseReference.child(dotlessEmail);
         mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
         mSearchedUserFlatsDatabaseReference = mUsersFlatsDatabaseReference.child(dotlessEmail);
