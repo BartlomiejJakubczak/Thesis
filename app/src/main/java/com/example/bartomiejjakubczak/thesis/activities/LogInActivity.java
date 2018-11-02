@@ -1,7 +1,9 @@
 package com.example.bartomiejjakubczak.thesis.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
+import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,7 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class LogInActivity extends AppCompatActivity implements FirebaseConnection {
+public class LogInActivity extends AppCompatActivity implements FirebaseConnection, SharedPrefs{
 
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 1;
@@ -113,7 +116,9 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
                     String dotlessEmail = userEmail.replaceAll("[\\s.]", "");
-                    mUsersDatabaseReference.child(dotlessEmail).setValue(new User(userName, userSurname, userEmail));
+                    final User user = new User(userName, userSurname, userEmail);
+                    mUsersDatabaseReference.child(dotlessEmail).setValue(user);
+                    putStringToSharedPrefs(getApplicationContext(), "shared_prefs_user_tag", user.getTag());
                 }
             }
 
@@ -149,5 +154,15 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return null;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.bartomiejjakubczak.thesis.activities;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.widget.EditText;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
+import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditProfileActivity extends AppCompatActivity implements FirebaseConnection {
+public class EditProfileActivity extends AppCompatActivity implements FirebaseConnection, SharedPrefs {
 
     private static final String TAG = "EditProfileActivity";
     private String oldTag;
@@ -145,6 +148,7 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
     }
 
     private void updateTag(String newTag) {
+        putStringToSharedPrefs(getApplicationContext(), "shared_prefs_user_tag", newTag);
         mSearchedUserDatabaseReference.child(getString(R.string.user_node_tag)).setValue(newTag.trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -152,5 +156,15 @@ public class EditProfileActivity extends AppCompatActivity implements FirebaseCo
                 finish();
             }
         });
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return null;
     }
 }

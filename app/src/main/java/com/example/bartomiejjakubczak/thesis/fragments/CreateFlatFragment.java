@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.models.Flat;
@@ -96,7 +97,7 @@ public class CreateFlatFragment extends Fragment implements SharedPrefs, Firebas
     }
 
     private void createNewFlat(final String roomName, final String roomAddress, final String userDotlessEmail) {
-        final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail);
+        final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail, loadStringFromSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag"));
 
         mFlatsUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -178,6 +179,6 @@ public class CreateFlatFragment extends Fragment implements SharedPrefs, Firebas
 
     @Override
     public String loadStringFromSharedPrefs(Context context, String label) {
-        return null;
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
     }
 }

@@ -1,11 +1,12 @@
 package com.example.bartomiejjakubczak.thesis.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
+import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.models.Flat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditProfileFragment extends Fragment implements FirebaseConnection {
+public class EditProfileFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
     private static final String TAG = "EditProfileFragment";
     private String oldTag;
@@ -39,6 +43,9 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedUserDatabaseReference;
     private DatabaseReference mUserDatabaseReference;
+    private DatabaseReference mSearchedUserFlatsDatabaseReference;
+    private DatabaseReference mFlatsDatabaseReference;
+    private DatabaseReference mSearchedUserNotificationsDatabaseReference;
 
     private EditText tag;
     private Button doneButton;
@@ -69,6 +76,7 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection 
                 }
                 tag.setText(parameters.get(3));
                 oldTag = parameters.get(3);
+                Log.d(TAG, oldTag);
             }
 
             @Override
@@ -132,8 +140,10 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection 
         }
     }
 
-    private void updateTag(String newTag) {
+    private void updateTag(final String newTag) {
         doneButton.setEnabled(false);
+        putStringToSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag", newTag);
+        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
         mSearchedUserDatabaseReference.child(getString(R.string.user_node_tag)).setValue(newTag.trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -141,6 +151,60 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection 
                 doneButton.setEnabled(true);
             }
         });
+        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    currentSearchedUserFlatsKeys.add(ds.getKey());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
+                        mFlatsDatabaseReference.child(ds.getKey()).child("ownerTag").setValue(newTag);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mSearchedUserNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dsEmails: dataSnapshot.getChildren()) {
+                    for (DataSnapshot dsSentReceivedNotifications: dsEmails.getChildren()) {
+                        for (DataSnapshot dsNotificationKeys: dsSentReceivedNotifications.getChildren()) {
+                            if (dsNotificationKeys.child("personInvolvedTag").getValue().toString().equals(oldTag)) {
+                                mSearchedUserNotificationsDatabaseReference
+                                        .child(dsEmails.getKey())
+                                        .child(dsSentReceivedNotifications.getKey())
+                                        .child(dsNotificationKeys.getKey())
+                                        .child("personInvolvedTag")
+                                        .setValue(newTag);
+                            }
+                            Log.d(TAG, dsNotificationKeys.child("personInvolvedTag").getValue().toString());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        oldTag = newTag;
     }
 
     @Override
@@ -166,5 +230,18 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection 
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mSearchedUserDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users)).child(dotlessEmail);
         mUserDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
+        mSearchedUserFlatsDatabaseReference = mFirebaseDatabase.getReference().child("userFlats").child(dotlessEmail);
+        mFlatsDatabaseReference = mFirebaseDatabase.getReference().child("flats");
+        mSearchedUserNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications");
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return null;
     }
 }

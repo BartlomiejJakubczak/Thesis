@@ -59,20 +59,38 @@ I should think of replacing information about all flats with something different
 too much data. Then I should filter flats showing up in FlatSearchFragment to be only those which are not the currently selected user's and
 implement requests to join.
 
------------------------------------------------------------25.10.2018------------------------------------------------------------
+-----------------------------------------------------------29.10.2018------------------------------------------------------------
 
+Make transmissions between notifications fragment and fragments from drawer. Design the notifications elements and populate the recycler view.
+Change icon every time there are notifications not yet dealt with by the user.
 
+----------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------31.10.2018------------------------------------------------------------
+
+Make sure that you implemented notifications in the correct way (notificaions -> user currently logged in -> received/sent notifications)
+Search for all notifications in receivedNotifications in the fragment and pass the lists correctly to the adapter which should display
+correct requestJoinNotification based on its type (it is stated in field notificationType) as a ListNotifications object.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------01.11.2018------------------------------------------------------------
+
+I think that notifications are now viewed correctly, but there is no listener for them in mainactivity (to indicate that there are some new notifications)
+and editing tags doesnt work as intended, it has to be fixed entirely. So tomorrow fix tag editing and if everything else is fine then implement flat adding from requests.
+Maybe don't add personInvolvedTag as a variable in notifications and draw this information separately from user database
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
-- hitting button instead of slider at the beggining locks the drawer
-- create a refresh button for flat searching fragment
+- editing tags doesnt work properly, whole rework is necessary
+- when loading info at the beggining of the app disable the button
+- when changing somethingin fragments like edit profile try to disable drawer until all info is loaded (maybe)
+- create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - make CreateFlatDialog dissapear proof or think of another way for the user to create/join flat (in case he chooses join and requests,
   pop a window which will inform him that he has to wait for verdict of owner in order to further use app
   and let him create a flat in the meanwhile if he wants to) (the waiting will be possible by utilizing firebase database listeners)
 
-- write notes about sharedPrefs (which does what) or refactor them
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)
 - deal with situation when user is deleting his last flat
 - deleting isnt complete yet, it wont delete flat node of user that is also in this flat

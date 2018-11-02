@@ -1,6 +1,5 @@
 package com.example.bartomiejjakubczak.thesis.fragments;
 
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -106,7 +105,8 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
                         flats.add(new Flat(ds.child("name").getValue().toString(),
                                 ds.child("address").getValue().toString(),
                                 ds.child("owner").getValue().toString(),
-                                ds.child("key").getValue().toString()));
+                                ds.child("key").getValue().toString(),
+                                ds.child("ownerTag").getValue().toString()));
                     }
                 }
                 flatsCopy.addAll(flats);
@@ -150,6 +150,6 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
                 .child(getString(R.string.firebase_reference_user_flats))
                 .child(dotlessEmail);
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
-        mCurrentUserRequestsDatabaseReference = mFirebaseDatabase.getReference().child("sentRequests").child(dotlessEmail);
+        mCurrentUserRequestsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child(dotlessEmail).child("sentNotifications");
     }
 }

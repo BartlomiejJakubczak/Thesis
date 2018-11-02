@@ -8,19 +8,22 @@ public class Flat {
     private String address;
     private String key;
     private String owner;
+    private String ownerTag;
 
-    public Flat(String name, String address, String ownerEmailAddress) {
+    public Flat(String name, String address, String ownerEmailAddress, String ownerTag) {
         this.name = name;
         this.address = address;
         key = generateKey();
         this.owner = ownerEmailAddress;
+        this.ownerTag = ownerTag;
     }
 
-    public Flat(String name, String address, String ownerEmailAddress, String key) {
+    public Flat(String name, String address, String ownerEmailAddress, String key, String ownerTag) {
         this.name = name;
         this.address = address;
         this.key = key;
         this.owner = ownerEmailAddress;
+        this.ownerTag = ownerTag;
     }
 
     public String getName() {
@@ -45,6 +48,10 @@ public class Flat {
 
     public String getOwner() {
         return owner;
+    }
+
+    public String getOwnerTag() {
+        return ownerTag;
     }
 
     private String generateKey() {

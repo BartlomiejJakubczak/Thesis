@@ -109,7 +109,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
 
     @Override
     public String loadStringFromSharedPrefs(Context context, String label) {
-        return null;
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
     }
 
     @Override
@@ -161,7 +161,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
      */
 
     private void createNewFlat(final String roomName, final String roomAddress, String userDotlessEmail) {
-        final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail);
+        final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail, loadStringFromSharedPrefs(getApplicationContext(), "shared_prefs_user_tag"));
 
         mFlatsUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

@@ -3,7 +3,6 @@ package com.example.bartomiejjakubczak.thesis.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +10,9 @@ import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
-import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.models.Flat;
-import com.example.bartomiejjakubczak.thesis.models.Request;
+import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,10 +23,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearchFragmentHolder> implements FirebaseConnection {
 
-    Context context;
+    private final Context context;
     private String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     private ArrayList<Flat> flats = new ArrayList<>();
     private ArrayList<Flat> flatsCopy = new ArrayList<>();
@@ -36,6 +35,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRequestSenderDatabaseReference;
     private DatabaseReference mRequestReceiverDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
 
     public FlatsSearchFragmentAdapter(Context context, ArrayList<Flat> flats, ArrayList<Flat> flatsCopy) {
         this.context = context;
@@ -78,11 +78,15 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
 
     @Override
     public void onBindViewHolder(@NonNull final FlatsSearchFragmentHolder holder, int position) {
-        final String flatOwner = flats.get(position).getOwner();
+        final String flatOwnerKey = flats.get(position).getOwner();
+        final String flatOwnerTag = flats.get(position).getOwnerTag();
         final String flatKey = flats.get(position).getKey();
+        final String flatName = flats.get(position).getName();
+        final String[] senderTag = new String[1];
+
         holder.flatName.setText(flats.get(position).getName());
         holder.flatAddress.setText(flats.get(position).getAddress());
-        holder.flatOwner.setText(flats.get(position).getOwner());
+        holder.flatOwner.setText(flats.get(position).getOwnerTag());
         holder.requestJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,8 +94,8 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                 mRequestSenderDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Request request = new Request("Join request", flatOwner, flatKey);
-                        mRequestSenderDatabaseReference.child(request.getKey()).setValue(request);
+                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, flatOwnerTag, flatKey, flatName);
+                        mRequestSenderDatabaseReference.child(requestJoinNotification.getKey()).setValue(requestJoinNotification);
                     }
 
                     @Override
@@ -100,15 +104,27 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                     }
                 });
 
-                mRequestReceiverDatabaseReference.child(flatOwner).addListenerForSingleValueEvent(new ValueEventListener() {
+                mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Request request = new Request("Join request", userDotlessEmail, flatKey);
-                        mRequestReceiverDatabaseReference.child(flatOwner).child(request.getKey()).setValue(request).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        senderTag[0] = dataSnapshot.getValue().toString();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                mRequestReceiverDatabaseReference.child(flatOwnerKey).child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", userDotlessEmail, senderTag[0], flatKey, flatName);
+                        mRequestReceiverDatabaseReference.child(flatOwnerKey).child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 removeAt(holder.getAdapterPosition());
-                                Toast.makeText(MainActivity.getContext(), "The reques has been sent", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.getContext(), "The notification has been sent", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -134,7 +150,8 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
 
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-        mRequestSenderDatabaseReference = mFirebaseDatabase.getReference().child("sentRequests").child(dotlessEmail);
-        mRequestReceiverDatabaseReference = mFirebaseDatabase.getReference().child("receivedRequests");
+        mRequestSenderDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child(dotlessEmail).child("sentNotifications");
+        mRequestReceiverDatabaseReference = mFirebaseDatabase.getReference().child("notifications");
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users").child(dotlessEmail).child("tag");
     }
 }

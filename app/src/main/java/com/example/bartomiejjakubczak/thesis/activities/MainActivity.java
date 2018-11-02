@@ -11,8 +11,10 @@ import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +31,7 @@ import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
 import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
+    private DrawerLayout.DrawerListener mDrawerListener;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -68,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate was called");
         context = this;
         initializeFirebaseComponents();
         setContentView(R.layout.activity_main);
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // TODO THIS GETS CALLED EVERY TIME USER LEAVES APP/RETURNS TO IT
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     currentUserEmail = user.getEmail().replaceAll("[\\s.]", "");
@@ -116,6 +122,14 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
                 return true;
+            case R.id.notifications_menu:
+                // TODO has to transmit between other fragments in drawers
+                FragmentManager notificationsFragmentManager = getFragmentManager();
+                FragmentTransaction notificationsFragmentTransaction = notificationsFragmentManager.beginTransaction();
+                NotificationsFragment notificationsFragment = new NotificationsFragment();
+                notificationsFragmentTransaction.replace(R.id.fragment_placeholder, notificationsFragment, "notificationsFragment");
+                notificationsFragmentTransaction.commit();
+                return true;
             case android.R.id.home:
                 if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
                     mDrawerLayout.closeDrawer(GravityCompat.END);
@@ -133,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     private void setDrawer() {
         setSupportActionBar(mToolbar);
-        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
+        ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
@@ -186,9 +200,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             }
         });
 
-        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+        mDrawerListener = new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
             }
 
             @Override
@@ -205,7 +220,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             public void onDrawerStateChanged(int newState) {
 
             }
-        });
+        };
+        mDrawerLayout.addDrawerListener(mDrawerListener);
     }
 
     @Override
@@ -234,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         FlatSearchFragment flatSearchFragment = (FlatSearchFragment) getFragmentManager().findFragmentByTag("flatSearchFragment");
         EditFlatFragment editFlatFragment = (EditFlatFragment) getFragmentManager().findFragmentByTag("flatEditFragment");
         EditProfileFragment editProfileFragment = (EditProfileFragment) getFragmentManager().findFragmentByTag("profileEditFragment");
+        NotificationsFragment notificationsFragment = (NotificationsFragment) getFragmentManager().findFragmentByTag("notificationsFragment");
 
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
             FragmentManager fragmentManager = getFragmentManager();
@@ -255,10 +272,16 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(editProfileFragment);
             fragmentTransaction.commit();
+        } else if (notificationsFragment != null && notificationsFragment.isVisible()) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(notificationsFragment);
+            fragmentTransaction.commit();
         }
     }
 
     private void setCurrentUserFlatsPrefs() {
+        Log.d(TAG, "setCurrentUserFlatsPrefs was called");
         final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
         String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
         if (currentFlatName.isEmpty() || currentFlatName.equals("No flat yet")) {
@@ -294,6 +317,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
                 }
             });
+        } else {
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
 
@@ -380,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
      */
 
     private void decideToShowCreateFlatDialog() {
+        Log.d(TAG, "decideToShowCreateFlatDialog was called");
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -432,6 +458,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        mDrawerLayout.addDrawerListener(mDrawerListener);
     }
 
     @Override
@@ -440,5 +467,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+        mDrawerLayout.removeDrawerListener(mDrawerListener);
     }
 }

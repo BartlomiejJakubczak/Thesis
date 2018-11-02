@@ -72,6 +72,7 @@ public class DeleteFlatDialogFragment extends DialogFragment implements SharedPr
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         noButton = true;
+                        dismiss();
                     }
                 });
         return builder.create();
