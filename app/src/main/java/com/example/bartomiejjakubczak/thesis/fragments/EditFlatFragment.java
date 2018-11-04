@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
     private FirebaseAuth mFirebaseAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedFlatDatabaseReference;
+    private DatabaseReference mReceivedNotificationsDatabaseReference;
 
     private EditText flatName;
     private EditText flatAddress;
@@ -93,26 +95,47 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
         return "".equals(testString);
     }
 
-    private void updateFlatParameters(String newFlatName, String newFlatAddress) {
+    private void updateFlatParameters(final String newFlatName, final String newFlatAddress) {
         doneButton.setEnabled(false);
         putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_name), newFlatName.trim());
         putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_address), newFlatAddress.trim());
         mSearchedFlatDatabaseReference.child(getString(R.string.flat_node_name)).setValue(newFlatName.trim());
         mSearchedFlatDatabaseReference.child(getString(R.string.flat_node_address)).setValue(newFlatAddress.trim());
-        doneButton.setEnabled(true);
+        mReceivedNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (ds.child("flatInvolvedName").getValue().toString().equals(oldName)) {
+                        mReceivedNotificationsDatabaseReference.child(ds.getKey()).child("flatInvolvedName").setValue(newFlatName);
+                        oldName = newFlatName;
+                        oldAddress = newFlatAddress;
+                        doneButton.setEnabled(true);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void setEditTexts() {
         mSearchedFlatDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    parameters.add(ds.getValue().toString());
-                }
-                flatName.setText(parameters.get(2));
-                oldName = parameters.get(2);
-                flatAddress.setText(parameters.get(0));
-                oldAddress = parameters.get(0);
+//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+//                    parameters.add(ds.getValue().toString());
+//                }
+//                flatName.setText(parameters.get(2));
+//                oldName = parameters.get(2);
+//                flatAddress.setText(parameters.get(0));
+//                oldAddress = parameters.get(0);
+                oldName = dataSnapshot.child("name").getValue().toString();
+                flatName.setText(oldName);
+                oldAddress = dataSnapshot.child("address").getValue().toString();
+                flatAddress.setText(oldAddress);
             }
 
             @Override
@@ -145,6 +168,7 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mSearchedFlatDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats))
                 .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)));
+        mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("receivedNotifications");
     }
 
     @Override

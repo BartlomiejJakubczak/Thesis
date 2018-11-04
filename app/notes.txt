@@ -88,6 +88,7 @@ I found solution to home button problem, i assigned toolbar as a member field an
 maybe it could be shared throughout all project, which would bring end to "no flat yet" problem. I fixed database relations, but in case
 of notifications i still think they need some work. As of nw, requests show properly, now I need to implement accepting/denying user
 (might involve relations fixing)
+For tomorrow you should also fix flat address & name changing, because it might not be working properly.
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
