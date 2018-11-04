@@ -60,7 +60,8 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                                         ds.child("personInvolvedTag").getValue().toString(),
                                         ds.child("flatInvolvedKey").getValue().toString(),
                                         ds.child("flatInvolvedName").getValue().toString(),
-                                        ds.child("key").getValue().toString()
+                                        ds.child("key").getValue().toString(),
+                                        ds.child("sentNotificationKey").getValue().toString()
                                 );
                                 receivedNotifications.add(requestJoinNotification);
                             }

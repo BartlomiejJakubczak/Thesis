@@ -84,6 +84,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
         final String flatKey = flats.get(position).getKey();
         final String flatName = flats.get(position).getName();
         final String senderTag = loadStringFromSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag");
+        final String[] sentNotificationKey = new String[1];
 
         holder.flatName.setText(flats.get(position).getName());
         holder.flatAddress.setText(flats.get(position).getAddress());
@@ -97,6 +98,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", userDotlessEmail, flatKey);
+                        sentNotificationKey[0] = requestJoinNotification.getKey();
                         mRequestSenderDatabaseReference.child(requestJoinNotification.getKey()).setValue(requestJoinNotification);
                     }
 
@@ -109,7 +111,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                 mRequestReceiverDatabaseReference.child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, senderTag, flatKey, flatName);
+                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, senderTag, flatKey, flatName, sentNotificationKey[0]);
                         mRequestReceiverDatabaseReference.child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {

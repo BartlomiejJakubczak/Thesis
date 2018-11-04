@@ -11,25 +11,34 @@ public class RequestJoinNotification implements ListNotifications {
     private String personInvolvedTag;
     private String flatInvolvedKey;
     private String flatInvolvedName;
+    private String sentNotificationKey;
     private String key;
 
-    public RequestJoinNotification(String topic, String personInvolvedKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName) {
+    // This is called when generting new request to receivedNotifications
+
+    public RequestJoinNotification(String topic, String personInvolvedKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String sentNotificationKey) {
         this.topic = topic;
         this.personInvolvedKey = personInvolvedKey;
         this.personInvolvedTag = personInvolvedTag;
         this.flatInvolvedKey = flatInvolvedKey;
         this.flatInvolvedName = flatInvolvedName;
+        this.sentNotificationKey = sentNotificationKey;
         key = generateKey();
     }
 
-    public RequestJoinNotification(String topic, String personInvolvedKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String key) {
+    // This is called when getting info about notification in adapter
+
+    public RequestJoinNotification(String topic, String personInvolvedKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String key, String sentNotificationKey) {
         this.topic = topic;
         this.personInvolvedKey = personInvolvedKey;
         this.personInvolvedTag = personInvolvedTag;
         this.flatInvolvedKey = flatInvolvedKey;
         this.flatInvolvedName = flatInvolvedName;
+        this.sentNotificationKey = sentNotificationKey;
         this.key = key;
     }
+
+    // This is in sentNotifications
 
     public RequestJoinNotification(String topic, String personInvolvedKey, String flatInvolvedKey) {
         this.key = generateKey();
@@ -44,10 +53,6 @@ public class RequestJoinNotification implements ListNotifications {
 
     public String getPersonInvolvedKey() {
         return personInvolvedKey;
-    }
-
-    public String getKey() {
-        return key;
     }
 
     public String getFlatInvolvedKey() {
@@ -84,5 +89,13 @@ public class RequestJoinNotification implements ListNotifications {
 
     public void setFlatInvolvedName(String flatInvolvedName) {
         this.flatInvolvedName = flatInvolvedName;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getSentNotificationKey() {
+        return sentNotificationKey;
     }
 }
