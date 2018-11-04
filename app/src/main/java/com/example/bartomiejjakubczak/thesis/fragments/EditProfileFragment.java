@@ -68,12 +68,8 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
         mSearchedUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    parameters.add(ds.getValue().toString());
-                }
-                tag.setText(parameters.get(3));
-                oldTag = parameters.get(3);
-                Log.d(TAG, oldTag);
+                oldTag = dataSnapshot.child("tag").getValue().toString();
+                tag.setText(oldTag);
             }
 
             @Override
@@ -135,6 +131,7 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
                             for (DataSnapshot ds: dataSnapshot.getChildren()) {
                                 if (ds.child("personInvolvedTag").getValue().toString().equals(oldTag)) {
                                     mReceivedNotificationsDatabaseReference.child(ds.getKey()).child("personInvolvedTag").setValue(newTag);
+                                    oldTag = newTag;
                                     doneButton.setEnabled(true);
                                 }
                             }

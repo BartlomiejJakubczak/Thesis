@@ -125,13 +125,6 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
         mSearchedFlatDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-//                    parameters.add(ds.getValue().toString());
-//                }
-//                flatName.setText(parameters.get(2));
-//                oldName = parameters.get(2);
-//                flatAddress.setText(parameters.get(0));
-//                oldAddress = parameters.get(0);
                 oldName = dataSnapshot.child("name").getValue().toString();
                 flatName.setText(oldName);
                 oldAddress = dataSnapshot.child("address").getValue().toString();
