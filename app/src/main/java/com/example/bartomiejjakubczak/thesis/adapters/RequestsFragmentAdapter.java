@@ -37,6 +37,8 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSentNotificationsDatabaseReference;
     private DatabaseReference mReceivedNotificationsDatabaseReference;
+    private DatabaseReference mUserFlatsDatabaseReference;
+    private DatabaseReference mFlatUsersDatabaseReference;
 
     public RequestsFragmentAdapter(Context context, ArrayList<ListNotifications> notifications, ArrayList<ListNotifications> notificationsCopy) {
         this.context = context;
@@ -77,7 +79,15 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                 joinFragmentHolder.acceptButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        removeAt(holder.getAdapterPosition());
+                        mFlatUsersDatabaseReference.child(requestJoinNotification.getFlatInvolvedKey()).child(requestJoinNotification.getPersonInvolvedKey()).setValue(true);
+                        mUserFlatsDatabaseReference.child(requestJoinNotification.getPersonInvolvedKey()).child(requestJoinNotification.getFlatInvolvedKey()).setValue(true);
+                        mSentNotificationsDatabaseReference.child(requestJoinNotification.getSentNotificationKey()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                mReceivedNotificationsDatabaseReference.child(requestJoinNotification.getKey()).removeValue();
+                            }
+                        });
                     }
                 });
                 joinFragmentHolder.declineButton.setOnClickListener(new View.OnClickListener() {
@@ -115,5 +125,7 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mSentNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("sentNotifications");
         mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("receivedNotifications");
+        mUserFlatsDatabaseReference = mFirebaseDatabase.getReference().child("userFlats");
+        mFlatUsersDatabaseReference = mFirebaseDatabase.getReference().child("flatUsers");
     }
 }

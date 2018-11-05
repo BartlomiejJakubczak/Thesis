@@ -105,7 +105,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                                 mRequestReceiverDatabaseReference.child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, senderTag, flatKey, flatName, sentNotificationKey[0]);
+                                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", userDotlessEmail, flatOwnerKey, senderTag, flatKey, flatName, sentNotificationKey[0]);
                                         mRequestReceiverDatabaseReference.child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {

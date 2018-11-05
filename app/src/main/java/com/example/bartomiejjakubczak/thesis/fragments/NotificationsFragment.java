@@ -53,10 +53,11 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     if (ds.child("topic").getValue().toString().equals("Join flat")) {
-                        if (ds.child("personInvolvedKey").getValue().toString().equals(userDotlessEmail)) {
+                        if (ds.child("receiverKey").getValue().toString().equals(userDotlessEmail)) {
                             final RequestJoinNotification requestJoinNotification = new RequestJoinNotification(
                                     ds.child("topic").getValue().toString(),
                                     ds.child("personInvolvedKey").getValue().toString(),
+                                    ds.child("receiverKey").getValue().toString(),
                                     ds.child("personInvolvedTag").getValue().toString(),
                                     ds.child("flatInvolvedKey").getValue().toString(),
                                     ds.child("flatInvolvedName").getValue().toString(),

@@ -99,6 +99,13 @@ I almost made deleting the holder from NotificationsFragment work, but it seems 
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------05.11.2018------------------------------------------------------------
+
+Adding users works, now you have to redo deleting completely (you cant let other users delete flat when they are not owners)
+and proceed with functionalities
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 ISSUES:
 - when changing somethingin fragments like edit profile try to disable drawer until all info is loaded (maybe)
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)

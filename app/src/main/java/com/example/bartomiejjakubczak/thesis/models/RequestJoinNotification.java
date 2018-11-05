@@ -8,6 +8,7 @@ public class RequestJoinNotification implements ListNotifications {
 
     private String topic;
     private String personInvolvedKey;
+    private String receiverKey;
     private String personInvolvedTag;
     private String flatInvolvedKey;
     private String flatInvolvedName;
@@ -16,9 +17,10 @@ public class RequestJoinNotification implements ListNotifications {
 
     // This is called when generting new request to receivedNotifications
 
-    public RequestJoinNotification(String topic, String personInvolvedKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String sentNotificationKey) {
+    public RequestJoinNotification(String topic, String personInvolvedKey, String receiverKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String sentNotificationKey) {
         this.topic = topic;
         this.personInvolvedKey = personInvolvedKey;
+        this.receiverKey = receiverKey;
         this.personInvolvedTag = personInvolvedTag;
         this.flatInvolvedKey = flatInvolvedKey;
         this.flatInvolvedName = flatInvolvedName;
@@ -28,9 +30,10 @@ public class RequestJoinNotification implements ListNotifications {
 
     // This is called when getting info about notification in adapter
 
-    public RequestJoinNotification(String topic, String personInvolvedKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String key, String sentNotificationKey) {
+    public RequestJoinNotification(String topic, String personInvolvedKey, String receiverKey, String personInvolvedTag, String flatInvolvedKey, String flatInvolvedName, String key, String sentNotificationKey) {
         this.topic = topic;
         this.personInvolvedKey = personInvolvedKey;
+        this.receiverKey = receiverKey;
         this.personInvolvedTag = personInvolvedTag;
         this.flatInvolvedKey = flatInvolvedKey;
         this.flatInvolvedName = flatInvolvedName;
@@ -97,5 +100,9 @@ public class RequestJoinNotification implements ListNotifications {
 
     public String getSentNotificationKey() {
         return sentNotificationKey;
+    }
+
+    public String getReceiverKey() {
+        return receiverKey;
     }
 }
