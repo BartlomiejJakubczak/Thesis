@@ -92,6 +92,13 @@ For tomorrow you should also fix flat address & name changing, because it might 
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------04.11.2018------------------------------------------------------------
+
+I almost made deleting the holder from NotificationsFragment work, but it seems like creating switch there makes it malfunction, try to do it differently
+(I did it differently and it still duplicates with more items, investigate the case - look in stackoverflow, documentation and in medium article)
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 ISSUES:
 - when changing somethingin fragments like edit profile try to disable drawer until all info is loaded (maybe)
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)

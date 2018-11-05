@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +31,8 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
 
     private String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     private FirebaseDatabase mFirebaseDatabase;
-    public final List<ListNotifications> receivedNotifications = new ArrayList<ListNotifications>();
-    public final List<ListNotifications> receivedNotificationsCopy = new ArrayList<ListNotifications>();
+    public final ArrayList<ListNotifications> receivedNotifications = new ArrayList<ListNotifications>();
+    public final ArrayList<ListNotifications> receivedNotificationsCopy = new ArrayList<ListNotifications>();
 
     private RecyclerView recyclerView;
     private DatabaseReference mReceivedNotificationsDatabaseReference;
@@ -47,27 +48,28 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
     }
 
     private void loadNotifications() {
-        mReceivedNotificationsDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mReceivedNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    switch (ds.child("topic").getValue().toString()) {
-                        case "Join flat":
-                            if (ds.child("personInvolvedKey").getValue().toString().equals(userDotlessEmail)) {
-                                final RequestJoinNotification requestJoinNotification = new RequestJoinNotification(
-                                        ds.child("topic").getValue().toString(),
-                                        ds.child("personInvolvedKey").getValue().toString(),
-                                        ds.child("personInvolvedTag").getValue().toString(),
-                                        ds.child("flatInvolvedKey").getValue().toString(),
-                                        ds.child("flatInvolvedName").getValue().toString(),
-                                        ds.child("key").getValue().toString(),
-                                        ds.child("sentNotificationKey").getValue().toString()
-                                );
-                                receivedNotifications.add(requestJoinNotification);
-                            }
+                    if (ds.child("topic").getValue().toString().equals("Join flat")) {
+                        if (ds.child("personInvolvedKey").getValue().toString().equals(userDotlessEmail)) {
+                            final RequestJoinNotification requestJoinNotification = new RequestJoinNotification(
+                                    ds.child("topic").getValue().toString(),
+                                    ds.child("personInvolvedKey").getValue().toString(),
+                                    ds.child("personInvolvedTag").getValue().toString(),
+                                    ds.child("flatInvolvedKey").getValue().toString(),
+                                    ds.child("flatInvolvedName").getValue().toString(),
+                                    ds.child("key").getValue().toString(),
+                                    ds.child("sentNotificationKey").getValue().toString()
+                            );
+                            receivedNotifications.add(requestJoinNotification);
+
+                        }
                     }
-                }
+            }
                 receivedNotificationsCopy.addAll(receivedNotifications);
+                Log.d("Notifications taken:", " " + receivedNotifications.size());
                 RequestsFragmentAdapter requestsFragmentAdapter = new RequestsFragmentAdapter(MainActivity.getContext(), receivedNotifications, receivedNotificationsCopy);
                 recyclerView.setAdapter(requestsFragmentAdapter);
             }

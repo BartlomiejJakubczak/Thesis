@@ -2,8 +2,11 @@ package com.example.bartomiejjakubczak.thesis.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,8 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.ListNotifications;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,12 +31,14 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private final Context context;
     private String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
-    private List<ListNotifications> notifications = new ArrayList<>();
-    private List<ListNotifications> notificationsCopy = new ArrayList<>();
+    private ArrayList<ListNotifications> notifications = new ArrayList<>();
+    private ArrayList<ListNotifications> notificationsCopy = new ArrayList<>();
 
     private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mSentNotificationsDatabaseReference;
+    private DatabaseReference mReceivedNotificationsDatabaseReference;
 
-    public RequestsFragmentAdapter(Context context, List<ListNotifications> notifications, List<ListNotifications> notificationsCopy) {
+    public RequestsFragmentAdapter(Context context, ArrayList<ListNotifications> notifications, ArrayList<ListNotifications> notificationsCopy) {
         this.context = context;
         this.notifications.addAll(notifications);
         this.notificationsCopy.addAll(notificationsCopy);
@@ -58,10 +65,10 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case ListNotifications.TYPE_JOIN_NOTIFICATION:
-                RequestJoinNotification requestJoinNotification = (RequestJoinNotification) notifications.get(position);
+                final RequestJoinNotification requestJoinNotification = (RequestJoinNotification) notifications.get(position);
                 final RequestJoinFragmentHolder joinFragmentHolder = (RequestJoinFragmentHolder)holder;
 
                 joinFragmentHolder.title.setText("JOIN REQUEST");
@@ -76,10 +83,16 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                 joinFragmentHolder.declineButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
                         removeAt(holder.getAdapterPosition());
+                        mSentNotificationsDatabaseReference.child(requestJoinNotification.getSentNotificationKey()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                mReceivedNotificationsDatabaseReference.child(requestJoinNotification.getKey()).removeValue();
+                            }
+                        });
                     }
                 });
+                break;
         }
     }
 
@@ -100,6 +113,7 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-
+        mSentNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("sentNotifications");
+        mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("receivedNotifications");
     }
 }

@@ -93,30 +93,32 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
             @Override
             public void onClick(View v) {
                 holder.requestJoin.setEnabled(false);
-
+                removeAt(holder.getAdapterPosition());
                 mRequestSenderDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", userDotlessEmail, flatKey);
                         sentNotificationKey[0] = requestJoinNotification.getKey();
-                        mRequestSenderDatabaseReference.child(requestJoinNotification.getKey()).setValue(requestJoinNotification);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-                mRequestReceiverDatabaseReference.child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, senderTag, flatKey, flatName, sentNotificationKey[0]);
-                        mRequestReceiverDatabaseReference.child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mRequestSenderDatabaseReference.child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                removeAt(holder.getAdapterPosition());
-                                Toast.makeText(MainActivity.getContext(), "The notification has been sent", Toast.LENGTH_SHORT).show();
+                                mRequestReceiverDatabaseReference.child("receivedNotifications").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        RequestJoinNotification requestJoinNotification = new RequestJoinNotification("Join flat", flatOwnerKey, senderTag, flatKey, flatName, sentNotificationKey[0]);
+                                        mRequestReceiverDatabaseReference.child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Toast.makeText(MainActivity.getContext(), "The notification has been sent", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
                         });
                     }
@@ -126,6 +128,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
 
                     }
                 });
+
             }
         });
     }
