@@ -15,6 +15,13 @@ public class User {
         tag = generateTag();
     }
 
+    public User(String name, String surname, String email, String tag) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.tag = tag;
+    }
+
     public String getName() {
         return name;
     }

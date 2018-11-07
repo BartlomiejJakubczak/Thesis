@@ -31,6 +31,7 @@ import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
 import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
@@ -165,10 +166,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         createFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
-                    case R.id.nav_delete_flat:
-                        showDeleteFlatDialog();
-                        mDrawerLayout.closeDrawer(Gravity.START, true);
-                        return true;
+//                    case R.id.nav_delete_flat:
+//                        showDeleteFlatDialog();
+//                        mDrawerLayout.closeDrawer(Gravity.START, true);
+//                        return true;
                     case R.id.nav_edit_profile:
                         FragmentManager editProfileFragmentManager = getFragmentManager();
                         FragmentTransaction editProfileFragmentTransaction = editProfileFragmentManager.beginTransaction();
@@ -177,12 +178,12 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         editProfileFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
-                    case R.id.nav_edit_flat:
-                        FragmentManager editFragmentManager = getFragmentManager();
-                        FragmentTransaction editFragmentTransaction = editFragmentManager.beginTransaction();
-                        EditFlatFragment flatEditFragment = new EditFlatFragment();
-                        editFragmentTransaction.add(R.id.fragment_placeholder, flatEditFragment, "flatEditFragment");
-                        editFragmentTransaction.commit();
+                    case R.id.nav_manage_flat:
+                        FragmentManager manageFragmentManager = getFragmentManager();
+                        FragmentTransaction manageFragmentTransaction = manageFragmentManager.beginTransaction();
+                        ManageFlatFragment manageFlatFragment = new ManageFlatFragment();
+                        manageFragmentTransaction.add(R.id.fragment_placeholder, manageFlatFragment, "manageFlatFragment");
+                        manageFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_switch_flat:
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private void resetFragments() {
         CreateFlatFragment createFlatFragment = (CreateFlatFragment) getFragmentManager().findFragmentByTag("flatCreateFragment");
         FlatSearchFragment flatSearchFragment = (FlatSearchFragment) getFragmentManager().findFragmentByTag("flatSearchFragment");
-        EditFlatFragment editFlatFragment = (EditFlatFragment) getFragmentManager().findFragmentByTag("flatEditFragment");
+        ManageFlatFragment manageFlatFragment = (ManageFlatFragment) getFragmentManager().findFragmentByTag("manageFlatFragment");
         EditProfileFragment editProfileFragment = (EditProfileFragment) getFragmentManager().findFragmentByTag("profileEditFragment");
         NotificationsFragment notificationsFragment = (NotificationsFragment) getFragmentManager().findFragmentByTag("notificationsFragment");
 
@@ -264,10 +265,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(createFlatFragment);
             fragmentTransaction.commit();
-        } else if (editFlatFragment != null && editFlatFragment.isVisible()) {
+        } else if (manageFlatFragment != null && manageFlatFragment.isVisible()) {
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(editFlatFragment);
+            fragmentTransaction.remove(manageFlatFragment);
             fragmentTransaction.commit();
         } else if (editProfileFragment != null && editProfileFragment.isVisible()) {
             FragmentManager fragmentManager = getFragmentManager();

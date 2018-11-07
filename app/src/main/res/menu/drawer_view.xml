@@ -10,16 +10,11 @@
             android:checkable="false"/>
 
         <item
-            android:id="@+id/nav_edit_flat"
+            android:id="@+id/nav_manage_flat"
             android:icon="@drawable/ic_edit"
-            android:title="@string/drawer_menu_edit_flat"
+            android:title="Manage flat"
             android:checkable="false"/>
 
-        <item
-            android:id="@+id/nav_delete_flat"
-            android:icon="@drawable/ic_delete"
-            android:title="@string/drawer_menu_delete"
-            android:checkable="false"/>
 
         <item
             android:id="@+id/nav_switch_flat"
