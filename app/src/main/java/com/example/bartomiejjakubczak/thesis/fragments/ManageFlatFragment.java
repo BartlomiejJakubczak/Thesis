@@ -2,12 +2,15 @@ package com.example.bartomiejjakubczak.thesis.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +19,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.adapters.ManageFlatFragmentAdapter;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
 import com.example.bartomiejjakubczak.thesis.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,6 +43,8 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
     private final String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     private String oldName;
     private String oldAddress;
+    private Boolean isOldName = true;
+    private Boolean isOldAddress = true;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedFlatDatabaseReference;
@@ -45,47 +53,62 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
 
     private RecyclerView recyclerView;
     private ManageFlatFragmentAdapter manageFlatFragmentAdapter;
-    private TextView recyclerViewLabel;
     private EditText flatName;
     private ImageButton editFlatNameButton;
     private EditText flatAddress;
     private ImageButton editFlatAddressButton;
     private Button saveChangesButton;
-    private Button deleteFlatButton;
 
 
     private void setButtons() {
-        editFlatNameButton.setEnabled(false);
-        editFlatAddressButton.setEnabled(false);
-        saveChangesButton.setEnabled(false);
+        if (loadStringFromSharedPrefs(getActivity(), "shared_prefs_is_owner").equals("yes")) {
 
-        editFlatNameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            editFlatNameButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (flatName.isEnabled()) {
+                        flatName.setEnabled(false);
+                    } else {
+                        flatName.setEnabled(true);
+                    }
+                }
+            });
 
-            }
-        });
+            editFlatAddressButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (flatAddress.isEnabled()) {
+                        flatAddress.setEnabled(false);
+                    } else {
+                        flatAddress.setEnabled(true);
+                    }
+                }
+            });
 
-        editFlatAddressButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            saveChangesButton.setEnabled(false);
+            saveChangesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveChangesButton.setEnabled(false);
+                    final String newName = flatName.getText().toString();
+                    final String newAddress = flatAddress.getText().toString();
+                    mSearchedFlatDatabaseReference.child("name").setValue(newName);
+                    mSearchedFlatDatabaseReference.child("address").setValue(newAddress).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(getActivity(), "Changes saved", Toast.LENGTH_SHORT).show();
+                            oldName = newName;
+                            oldAddress = newAddress;
+                        }
+                    });
+                }
+            });
 
-            }
-        });
-
-        saveChangesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        deleteFlatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        } else {
+            editFlatNameButton.setVisibility(View.GONE);
+            editFlatAddressButton.setVisibility(View.GONE);
+            saveChangesButton.setVisibility(View.GONE);
+        }
     }
 
     private void setEditTexts() {
@@ -94,10 +117,62 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 oldName = dataSnapshot.child("name").getValue().toString();
                 flatName.setText(oldName);
+                flatName.setEnabled(false);
                 oldAddress = dataSnapshot.child("address").getValue().toString();
                 flatAddress.setText(oldAddress);
-                editFlatNameButton.setEnabled(true);
-                editFlatAddressButton.setEnabled(true);
+                flatAddress.setEnabled(false);
+                flatName.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (oldName.equals(s.toString())) {
+                            Log.d(TAG, isOldName.toString());
+                            Log.d(TAG, isOldAddress.toString());
+                            isOldName = true;
+                            if (isOldAddress) {
+                                saveChangesButton.setEnabled(false);
+                            }
+                        } else {
+                            isOldName = false;
+                            saveChangesButton.setEnabled(true);
+                        }
+                    }
+                });
+                flatAddress.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (oldAddress.equals(s.toString())) {
+                            Log.d(TAG, isOldName.toString());
+                            Log.d(TAG, isOldAddress.toString());
+                            isOldAddress = true;
+                            if (isOldName) {
+                                saveChangesButton.setEnabled(false);
+                            }
+                        } else {
+                            isOldAddress = false;
+                            saveChangesButton.setEnabled(true);
+                        }
+                    }
+                });
             }
 
             @Override
@@ -153,7 +228,6 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_manage_flat, container, false);
 
-        recyclerViewLabel = view.findViewById(R.id.users_recyclerView_label);
         recyclerView = view.findViewById(R.id.users_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
@@ -163,7 +237,7 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
         editFlatNameButton = view.findViewById(R.id.edit_flat_name_button);
         editFlatAddressButton = view.findViewById(R.id.edit_flat_address_button);
         saveChangesButton = view.findViewById(R.id.save_changes_button);
-        deleteFlatButton = view.findViewById(R.id.delete_flat_button);
+
         setButtons();
         setEditTexts();
         setRecyclerView();

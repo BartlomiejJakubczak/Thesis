@@ -133,6 +133,7 @@ public class CreateFlatFragment extends Fragment implements SharedPrefs, Firebas
                             putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_name), newFlat.getName());
                             putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_address), newFlat.getAddress());
                             putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key), newFlat.getKey());
+                            putStringToSharedPrefs(getActivity(), "shared_prefs_is_owner", "yes");
                             createFlat.setEnabled(true);
                         }
                     }

@@ -115,8 +115,26 @@ recycler view doesnt work, check whats wrong in ManageFlatFragmentAdapter / Mana
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------07.11.2018------------------------------------------------------------
+
+I started to check in MainActivity and in Flat Switching if the person switching to certain flat is its owner "shared_prefs_is_owner"
+"yes" or "no". You should also set those values when creating and deleting flats. Also, deleting now has to be completely redone.
+(Think about how to solve this problem)
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------08.11.2018------------------------------------------------------------
+
+Editing flat now should work for every user everywhere, its just matter of viewing the information about current flat properly.
+When it comes to deleting users you should reset the fragments if the flat from which he was deleted was his current flat, inform the user that he has
+been deleted nad switch him to another of his flats. If he has none, then present him with unavoidable dialog that he should create a flat or join one existing.
+If he chooses to join one, then show a fragment which will say that he has to wait to be accepted, and when he is waiting present him with an option to create flat or log out.
+There will be listeners for those things in main activity, so it will react immediately when the user gets accepted to flat or deleted from one.
+Also, you should consider removing shared prefs which are mutable, so things like flat name or address and instead look for them whenever necessary in the database.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 ISSUES:
-- deal with ownership of the flat situation (not owners shouldnt be able to delete or edit flat)
 - when changing somethingin fragments like edit profile try to disable drawer until all info is loaded (maybe)
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - make CreateFlatDialog dissapear proof or think of another way for the user to create/join flat (in case he chooses join and requests,

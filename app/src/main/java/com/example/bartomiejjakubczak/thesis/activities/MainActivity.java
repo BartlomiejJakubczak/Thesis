@@ -33,6 +33,7 @@ import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.SwitchFlatFragment;
 import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
@@ -187,8 +188,13 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_switch_flat:
-                        showSwitchFlatDialog();
-                        mDrawerLayout.closeDrawer(Gravity.START, false);
+                        //showSwitchFlatDialog();
+                        FragmentManager switchFragmentManager = getFragmentManager();
+                        FragmentTransaction switchFragmentTransaction = switchFragmentManager.beginTransaction();
+                        SwitchFlatFragment switchFlatFragment = new SwitchFlatFragment();
+                        switchFragmentTransaction.add(R.id.fragment_placeholder, switchFlatFragment, "switchFlatFragment");
+                        switchFragmentTransaction.commit();
+                        mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_find_flat:
                         FragmentManager findFragmentManager = getFragmentManager();
@@ -242,10 +248,26 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
      */
 
     private void updateUI() {
-        String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
-        String currentFlatAddress = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address));
-        mCurrentFlatName.setText(currentFlatName);
-        mCurrentFlatAddress.setText(currentFlatAddress);
+        mFlatsDatabaseReference
+                .child(loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key)))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!mCurrentFlatName.getText().equals(dataSnapshot.child("name").getValue().toString()) || !mCurrentFlatAddress.getText().equals(dataSnapshot.child("address").getValue().toString())) {
+                    mCurrentFlatName.setText(dataSnapshot.child("name").getValue().toString());
+                    mCurrentFlatAddress.setText(dataSnapshot.child("address").getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+//        String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
+//        String currentFlatAddress = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address));
+//        mCurrentFlatName.setText(currentFlatName);
+//        mCurrentFlatAddress.setText(currentFlatAddress);
     }
 
     private void resetFragments() {
@@ -254,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         ManageFlatFragment manageFlatFragment = (ManageFlatFragment) getFragmentManager().findFragmentByTag("manageFlatFragment");
         EditProfileFragment editProfileFragment = (EditProfileFragment) getFragmentManager().findFragmentByTag("profileEditFragment");
         NotificationsFragment notificationsFragment = (NotificationsFragment) getFragmentManager().findFragmentByTag("notificationsFragment");
+        SwitchFlatFragment switchFlatFragment = (SwitchFlatFragment) getFragmentManager().findFragmentByTag("switchFlatFragment");
 
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
             FragmentManager fragmentManager = getFragmentManager();
@@ -279,6 +302,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(notificationsFragment);
+            fragmentTransaction.commit();
+        } else if (switchFlatFragment != null && switchFlatFragment.isVisible()) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(switchFlatFragment);
             fragmentTransaction.commit();
         }
     }
@@ -309,6 +337,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                             putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ds.child("name").getValue().toString());
                             putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ds.child("address").getValue().toString());
                             putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ds.child("key").getValue().toString());
+                            if (currentUserEmail.equals(ds.child("owner").getValue().toString())) {
+                                putStringToSharedPrefs(getApplicationContext(), "shared_prefs_is_owner", "yes");
+                            } else {
+                                putStringToSharedPrefs(getApplicationContext(), "shared_prefs_is_owner", "no");
+                            }
                             break;
                         }
                     }
