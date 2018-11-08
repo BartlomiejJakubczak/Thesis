@@ -132,6 +132,8 @@ If he chooses to join one, then show a fragment which will say that he has to wa
 There will be listeners for those things in main activity, so it will react immediately when the user gets accepted to flat or deleted from one.
 Also, you should consider removing shared prefs which are mutable, so things like flat name or address and instead look for them whenever necessary in the database.
 
+Deleting works, now you should handle situation in which the user was already browsing the flat from which he was deleted.
+
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:

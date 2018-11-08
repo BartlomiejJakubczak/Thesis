@@ -65,13 +65,9 @@ public class FlatsAdapter extends RecyclerView.Adapter<FlatsHolder> implements S
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (currentUserEmail.equals(dataSnapshot.child(flatKey).child("owner").getValue().toString())) {
                             putStringToSharedPrefs(MainActivity.getContext(), "shared_prefs_is_owner", "yes");
-                            putStringToSharedPrefs(MainActivity.getContext(), "flat_name", flatName);
-                            putStringToSharedPrefs(MainActivity.getContext(), "flat_address", flatAddress);
                             putStringToSharedPrefs(MainActivity.getContext(), "flat_key", flatKey);
                         } else {
                             putStringToSharedPrefs(MainActivity.getContext(), "shared_prefs_is_owner", "no");
-                            putStringToSharedPrefs(MainActivity.getContext(), "flat_name", flatName);
-                            putStringToSharedPrefs(MainActivity.getContext(), "flat_address", flatAddress);
                             putStringToSharedPrefs(MainActivity.getContext(), "flat_key", flatKey);
                         }
                     }

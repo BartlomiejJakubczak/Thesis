@@ -97,8 +97,6 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
 
     private void updateFlatParameters(final String newFlatName, final String newFlatAddress) {
         doneButton.setEnabled(false);
-        putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_name), newFlatName.trim());
-        putStringToSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_address), newFlatAddress.trim());
         mSearchedFlatDatabaseReference.child(getString(R.string.flat_node_name)).setValue(newFlatName.trim());
         mSearchedFlatDatabaseReference.child(getString(R.string.flat_node_address)).setValue(newFlatAddress.trim());
         mReceivedNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {

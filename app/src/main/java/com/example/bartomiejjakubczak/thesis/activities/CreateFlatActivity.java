@@ -194,8 +194,6 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), newFlat.getName());
-                            putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), newFlat.getAddress());
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key), newFlat.getKey());
                             createFlat.setEnabled(true);
                             finish();

@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.adapters.FlatsSearchFragmentAdapter;
@@ -49,10 +50,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection, DeleteDialogCloseListener {
+public class MainActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection {
 
     private static final String TAG = "MainActivity";
-    private String currentUserEmail;
+    private String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     private static Context context;
 
     private TextView mCurrentFlatName;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         Log.d(TAG, "onCreate was called");
         context = this;
         initializeFirebaseComponents();
+        initializeFirebaseDatabaseReferences(currentUserEmail);
         setContentView(R.layout.activity_main);
         setViews();
         setDrawer();
@@ -89,14 +91,12 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 // TODO THIS GETS CALLED EVERY TIME USER LEAVES APP/RETURNS TO IT
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    currentUserEmail = user.getEmail().replaceAll("[\\s.]", "");
                     String cachedUserEmail = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_user_email));
                     if (!currentUserEmail.equals(cachedUserEmail)) {
                         putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name), getString(R.string.shared_prefs_default));
                         putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), getString(R.string.shared_prefs_default));
                     }
                     putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_user_email), currentUserEmail);
-                    initializeFirebaseDatabaseReferences(loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_user_email)));
                     decideToShowCreateFlatDialog();
                 } else {
                     Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
@@ -107,18 +107,12 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         };
     }
 
-    // ------------------------------------------MENUS AND DRAWER---------------------------------------------
-
-    // creates menu which holds button to sign off
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
-
-    // assigns action to buttons on the main menu, so signing off and pressing drawer hamburger icon
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -145,9 +139,31 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Initializes the drawer.
-     */
+    private void setListenerForFlatRemoval() {
+        mUsersFlatsDatabaseReference.child(currentUserEmail).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ArrayList<String> flatKeys = new ArrayList<>();
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    flatKeys.add(ds.getKey());
+                }
+                if (flatKeys.isEmpty()) {
+                    // TODO wyjeb delikwenta z main activity i daj mu aktywność / dialog żeby stworzył / dołączył do mieszkania
+                } else {
+                    if (!flatKeys.contains(loadStringFromSharedPrefs(getApplicationContext(), "flat_key"))) {
+                        resetFragments();
+                        Toast.makeText(getApplicationContext(), "You have been removed from room " + mCurrentFlatName.getText(), Toast.LENGTH_SHORT).show();
+                        putStringToSharedPrefs(getApplicationContext(), "flat_key", flatKeys.get(0));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     private void setDrawer() {
         setSupportActionBar(mToolbar);
@@ -167,10 +183,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         createFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
-//                    case R.id.nav_delete_flat:
-//                        showDeleteFlatDialog();
-//                        mDrawerLayout.closeDrawer(Gravity.START, true);
-//                        return true;
                     case R.id.nav_edit_profile:
                         FragmentManager editProfileFragmentManager = getFragmentManager();
                         FragmentTransaction editProfileFragmentTransaction = editProfileFragmentManager.beginTransaction();
@@ -188,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
                     case R.id.nav_switch_flat:
-                        //showSwitchFlatDialog();
                         FragmentManager switchFragmentManager = getFragmentManager();
                         FragmentTransaction switchFragmentTransaction = switchFragmentManager.beginTransaction();
                         SwitchFlatFragment switchFlatFragment = new SwitchFlatFragment();
@@ -243,10 +254,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
     }
 
-    /**
-     * Updates the UI based on flat selected by user
-     */
-
     private void updateUI() {
         mFlatsDatabaseReference
                 .child(loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key)))
@@ -264,10 +271,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
             }
         });
-//        String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
-//        String currentFlatAddress = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address));
-//        mCurrentFlatName.setText(currentFlatName);
-//        mCurrentFlatAddress.setText(currentFlatAddress);
     }
 
     private void resetFragments() {
@@ -314,8 +317,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private void setCurrentUserFlatsPrefs() {
         Log.d(TAG, "setCurrentUserFlatsPrefs was called");
         final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
-        String currentFlatName = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_name));
-        if (currentFlatName.isEmpty() || currentFlatName.equals("No flat yet")) {
+        String currentFlatKey = loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key));
+        if (currentFlatKey.isEmpty() || currentFlatKey.equals("No flat yet")) {
             mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -334,8 +337,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds: dataSnapshot.getChildren()) {
                         if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
-                            putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ds.child("name").getValue().toString());
-                            putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ds.child("address").getValue().toString());
                             putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ds.child("key").getValue().toString());
                             if (currentUserEmail.equals(ds.child("owner").getValue().toString())) {
                                 putStringToSharedPrefs(getApplicationContext(), "shared_prefs_is_owner", "yes");
@@ -347,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                     }
                     mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                     mActionBar.setDisplayHomeAsUpEnabled(true);
+                    setListenerForFlatRemoval();
                 }
 
                 @Override
@@ -355,14 +357,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 }
             });
         } else {
+            setListenerForFlatRemoval();
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
-    /**
-     * Sets all views visible inside this activity.
-     */
 
     private void setViews() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -373,74 +372,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mCurrentFlatAddress = mHeaderView.findViewById(R.id.drawer_header_subtitle);
     }
 
-    // ------------------------------------DIALOGS-------------------------------------------
-
     private void showCreateFlatDialog() {
         FragmentManager fragmentManager = getFragmentManager();
         DialogFragment createFlatAlertDialog = new CreateFlatDialogFragment();
         createFlatAlertDialog.show(fragmentManager, getString(R.string.tags_create_flat_dialog));
     }
-
-    private void showDeleteFlatDialog() {
-        FragmentManager fragmentManager = getFragmentManager();
-        DialogFragment deleteFlatAlertDialog = new DeleteFlatDialogFragment();
-        deleteFlatAlertDialog.show(fragmentManager, getString(R.string.tags_delete_flat_dialog));
-    }
-
-    @Override
-    public void handleDeleteDialogClose() {
-
-        //TODO HANDLE THE SITUATION WHEN USER IS DELETING HIS LAST FLAT
-        mActionBar.setDisplayHomeAsUpEnabled(false);
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
-        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    currentSearchedUserFlatsKeys.add(ds.getKey());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (currentSearchedUserFlatsKeys.contains(ds.getKey())) {
-                        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_name), ds.child("name").getValue().toString());
-                        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_address), ds.child("address").getValue().toString());
-                        putStringToSharedPrefs(MainActivity.getContext(), getString(R.string.shared_prefs_flat_key), ds.child("key").getValue().toString());
-                        mActionBar.setDisplayHomeAsUpEnabled(true);
-                        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void showSwitchFlatDialog() {
-        FragmentManager fragmentManager = getFragmentManager();
-        DialogFragment switchFlatAlertDialog = new SwitchFlatDialogFragment();
-        switchFlatAlertDialog.show(fragmentManager, getString(R.string.tags_switch_flat_dialog));
-    }
-
-    /**
-     * If the user doesn't have any flat or doesn't belong to any, this method shows dialog which informs
-     * user that he/she has to either create one or join one.
-     */
 
     private void decideToShowCreateFlatDialog() {
         Log.d(TAG, "decideToShowCreateFlatDialog was called");
@@ -475,12 +411,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         });
     }
 
-    /**
-     * Initializes references to firebase database in order to query data to specific json tables.
-     * @param dotlessEmail email address stripped out of dots necessary to look for specific user in database.
-     *                     email address is the key of user table.
-     */
-
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
@@ -489,10 +419,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mSearchedUserFlatsDatabaseReference = mUsersFlatsDatabaseReference.child(dotlessEmail);
         mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
     }
-
-    /**
-     * Initializes firebase components necessary for this activity.
-     */
 
     @Override
     public void initializeFirebaseComponents() {
@@ -508,7 +434,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-        mDrawerLayout.addDrawerListener(mDrawerListener);
     }
 
     @Override
@@ -517,6 +442,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-        mDrawerLayout.removeDrawerListener(mDrawerListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        putStringToSharedPrefs(getApplicationContext(), "flat_key", "No flat yet");
     }
 }
