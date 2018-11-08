@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -52,10 +53,41 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
         userDotlessEmail = currentUser.getEmail().replaceAll("[\\s.]", "");
         initializeFirebaseComponents();
         initializeFirebaseDatabaseReferences(userDotlessEmail);
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
+    }
+
+    @Override
+    public void initializeFirebaseComponents() {
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+    }
+
+    @Override
+    public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
+        mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
+        mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
+        mFlatsUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_flats_users));
+    }
+
+    private void setViews() {
+        flatName = findViewById(R.id.flat_name);
+        flatAddress = findViewById(R.id.flat_address);
+        nameLabel = findViewById(R.id.name_label);
+        addressLabel = findViewById(R.id.address_label);
+        createFlat = findViewById(R.id.create_flat_button);
 
         createFlat.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 String name = flatName.getText().toString();
                 String address = flatAddress.getText().toString();
                 boolean validName;
@@ -83,90 +115,23 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                     createFlat.setEnabled(false);
                     createNewFlat(flatName.getText().toString().trim(), flatAddress.getText().toString().trim(), userDotlessEmail.trim());
                 }
-
             }
         });
     }
-
-    /**
-     * Puts given String into shared preferences for later use, for example to indicate the currently selected flat.
-     * @param context context from which preferences are taken
-     * @param label key under which the String is stored
-     * @param string the String value to be stored
-     */
-
-    @Override
-    public void putStringToSharedPrefs(Context context, String label, String string) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
-    }
-
-    /**
-     * Loads String values located in shared preferences.
-     * @param context context from which preferences are taken
-     * @param label key under which the String is stored
-     * @return the String located under specified label
-     */
-
-    @Override
-    public String loadStringFromSharedPrefs(Context context, String label) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
-    }
-
-    @Override
-    public void initializeFirebaseComponents() {
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-    }
-
-    @Override
-    public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-        mFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_references_flats));
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
-        mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
-        mFlatsUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_flats_users));
-    }
-
-    /**
-     * Sets all views visible inside this activity.
-     */
-
-    private void setViews() {
-        flatName = findViewById(R.id.flat_name);
-        flatAddress = findViewById(R.id.flat_address);
-        nameLabel = findViewById(R.id.name_label);
-        addressLabel = findViewById(R.id.address_label);
-        createFlat = findViewById(R.id.create_flat_button);
-    }
-
-    /**
-     * Checks if given String is empty.
-     * @param string The given String
-     * @return returns true if given String is empty, false otherwise.
-     */
 
     private boolean checkIfEmpty(String string) {
         String testString = string.trim();
         return "".equals(testString);
     }
 
-//    private boolean checkIfNumbers(String string) {
-//        return string.matches(".*\\d+.*");
-//    }
 
-    /**
-     * Creates new flat and stores it in Firebase Database.
-     * The name and address of the new flat are being stored in shared preferences for later use.
-     * @param roomName Name of the flat specified by the user
-     * @param roomAddress Address of the flat specified by the user
-     * @param userDotlessEmail Email address without dots of the user
-     */
-
-    private void createNewFlat(final String roomName, final String roomAddress, String userDotlessEmail) {
+    private void createNewFlat(final String roomName, final String roomAddress, final String userDotlessEmail) {
         final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail, loadStringFromSharedPrefs(getApplicationContext(), "shared_prefs_user_tag"));
 
         mFlatsUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mFlatsUsersDatabaseReference.child(newFlat.getKey()).child(currentUser.getEmail().replaceAll("[\\s.]", "")).setValue(true);
+                mFlatsUsersDatabaseReference.child(newFlat.getKey()).child(FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "")).setValue(true);
             }
 
             @Override
@@ -178,7 +143,7 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
         mUsersFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mUsersFlatsDatabaseReference.child(currentUser.getEmail().replaceAll("[\\s.]", "")).child(newFlat.getKey()).setValue(true);
+                mUsersFlatsDatabaseReference.child(userDotlessEmail).child(newFlat.getKey()).setValue(true);
             }
 
             @Override
@@ -195,8 +160,10 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key), newFlat.getKey());
-                            createFlat.setEnabled(true);
+                            putStringToSharedPrefs(getApplicationContext(), "shared_prefs_is_owner", "yes");
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             finish();
+                            startActivity(intent);
                         }
                     }
                 });

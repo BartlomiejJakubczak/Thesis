@@ -28,11 +28,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class LogInActivity extends AppCompatActivity implements FirebaseConnection, SharedPrefs{
+public class LogInActivity extends AppCompatActivity implements FirebaseConnection, SharedPrefs {
 
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 1;
+    private String userDotlessEmail;
+
+    private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mUserFlatsDatabaseReference;
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -55,12 +60,10 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
                         verifyEmail(user);
                         finish();
                     } else {
-                        String userDotlessEmail = user.getEmail().replaceAll("[\\s.]", "");
+                        userDotlessEmail = user.getEmail().replaceAll("[\\s.]", "");
                         initializeFirebaseDatabaseReferences(userDotlessEmail);
                         createNewUserInDatabase(user);
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        startProperActivity();
                     }
                 } else {
                     // The user is not signed in
@@ -79,29 +82,42 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
     @Override
     public void initializeFirebaseComponents() {
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
     }
 
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
-        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
+        mUserFlatsDatabaseReference = mFirebaseDatabase.getReference().child("userFlats");
     }
 
-    /**
-     * Sends email verification to the user and takes the user to verification activity.
-     * @param user user who is trying to log in
-     */
+    private void startProperActivity() {
+        mUserFlatsDatabaseReference.child(userDotlessEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                    finish();
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    finish();
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     private void verifyEmail(FirebaseUser user) {
         user.sendEmailVerification();
         Intent intent = new Intent(this, VerificationActivity.class);
         startActivity(intent);
     }
-
-    /**
-     * Creates the new user in the Firebase Database.
-     * @param user newly created user's profile
-     */
 
     private void createNewUserInDatabase(final FirebaseUser user) {
         final String userEmail = user.getEmail();

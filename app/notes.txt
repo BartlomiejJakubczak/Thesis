@@ -137,13 +137,5 @@ Deleting works, now you should handle situation in which the user was already br
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
-- when changing somethingin fragments like edit profile try to disable drawer until all info is loaded (maybe)
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
-- make CreateFlatDialog dissapear proof or think of another way for the user to create/join flat (in case he chooses join and requests,
-  pop a window which will inform him that he has to wait for verdict of owner in order to further use app
-  and let him create a flat in the meanwhile if he wants to) (the waiting will be possible by utilizing firebase database listeners)
-
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)
-- deal with situation when user is deleting his last flat
-- deleting isnt complete yet, it wont delete flat node of user that is also in this flat
-- you have to change Dialogs from builders to onCreateViews in order to set setCanceledOnTouchOutside to false

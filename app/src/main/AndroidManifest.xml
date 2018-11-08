@@ -10,7 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name=".activities.MainActivity">
+            android:name=".activities.MainActivity"
+            android:noHistory="true">
         </activity>
         <activity android:name=".activities.VerificationActivity">
 
@@ -24,6 +25,7 @@
         <activity android:name=".activities.CreateFlatActivity" />
         <activity android:name=".activities.EditProfileActivity" />
         <activity android:name=".activities.EditFlatActivity" />
+        <activity android:name=".activities.WelcomeActivity" />
     </application>
 
 </manifest>
