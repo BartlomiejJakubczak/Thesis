@@ -3,6 +3,7 @@ package com.example.bartomiejjakubczak.thesis.fragments;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,8 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,7 +36,7 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
     private static final String TAG = "EditProfileFragment";
     private final String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     private String oldTag;
-    private List<String> parameters = new ArrayList<>();
+    private long mLastClickTime = 0;
     private boolean validTagDuplicate = true;
 
     private FirebaseAuth mFirebaseAuth;
@@ -55,6 +58,11 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+                doneButton.setEnabled(false);
                 InputMethodManager inputManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 String newTag = tag.getText().toString();
@@ -83,7 +91,6 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
         if (checkIfEmpty(newTag)) {
             tag.setError(getString(R.string.error_blank_field));
             tag.setText(oldTag);
-            tag.setHintTextColor(getResources().getColor(R.color.red));
         } else {
             checkIfDuplicate(newTag);
         }
@@ -95,50 +102,56 @@ public class EditProfileFragment extends Fragment implements FirebaseConnection,
     }
 
     private void checkIfDuplicate(final String newTag) {
-        mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mUserDatabaseReference.child(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (ds.child("tag").getValue().toString().equals(newTag)) {
-                        validTagDuplicate = false;
-                        tag.setError(getString(R.string.error_tag_exists));
-                        tag.setText(oldTag);
-                        tag.setHintTextColor(getResources().getColor(R.color.red));
-                    }
-                }
-                if (validTagDuplicate) {
-                    doneButton.setEnabled(false);
+                if (dataSnapshot.child("tag").getValue().toString().equals(newTag)) {
+                    tag.setError(getString(R.string.error_tag_exists));
+                    doneButton.setEnabled(true);
+                } else {
                     putStringToSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag", newTag);
-                    mUserDatabaseReference.child(currentUserEmail).child("tag").setValue(newTag);
-                    mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    mUserDatabaseReference.child(currentUserEmail).child("tag").setValue(newTag).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                                if (ds.child("ownerTag").getValue().toString().equals(oldTag)) {
-                                    mFlatsDatabaseReference.child(ds.getKey()).child("ownerTag").setValue(newTag);
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                                        if (ds.child("ownerTag").getValue().toString().equals(oldTag)) {
+                                            mFlatsDatabaseReference.child(ds.getKey()).child("ownerTag").setValue(newTag);
+                                        }
+                                    }
+
                                 }
-                            }
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
-                    mReceivedNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                                if (ds.child("personInvolvedTag").getValue().toString().equals(oldTag)) {
-                                    mReceivedNotificationsDatabaseReference.child(ds.getKey()).child("personInvolvedTag").setValue(newTag);
-                                    oldTag = newTag;
-                                    doneButton.setEnabled(true);
                                 }
-                            }
-                        }
+                            });
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            mReceivedNotificationsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                            if (ds.child("personInvolvedTag").getValue().toString().equals(oldTag)) {
+                                                mReceivedNotificationsDatabaseReference.child(ds.getKey()).child("personInvolvedTag").setValue(newTag);
+                                            }
+                                        }
+                                        doneButton.setEnabled(true);
+                                        oldTag = newTag;
+                                    } else {
+                                        doneButton.setEnabled(true);
+                                        oldTag = newTag;
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
 
                         }
                     });
