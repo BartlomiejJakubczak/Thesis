@@ -83,7 +83,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
         final String flatOwnerKey = flats.get(position).getOwner();
         final String flatKey = flats.get(position).getKey();
         final String flatName = flats.get(position).getName();
-        final String senderTag = loadStringFromSharedPrefs(MainActivity.getContext(), "shared_prefs_user_tag");
+        final String senderTag = loadStringFromSharedPrefs(context, "shared_prefs_user_tag");
         final String[] sentNotificationKey = new String[1];
 
         holder.flatName.setText(flats.get(position).getName());
@@ -109,7 +109,7 @@ public class FlatsSearchFragmentAdapter extends RecyclerView.Adapter<FlatsSearch
                                         mRequestReceiverDatabaseReference.child("receivedNotifications").child(requestJoinNotification.getKey()).setValue(requestJoinNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                Toast.makeText(MainActivity.getContext(), "The notification has been sent", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(context, "The notification has been sent", Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     }

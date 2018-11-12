@@ -33,6 +33,7 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 1;
     private String userDotlessEmail;
+    private String userTag;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
@@ -92,6 +93,18 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
     }
 
     private void startProperActivity() {
+        mUsersDatabaseReference.child(userDotlessEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                putStringToSharedPrefs(getApplicationContext(), "shared_prefs_user_tag", dataSnapshot.child("tag").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         mUserFlatsDatabaseReference.child(userDotlessEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

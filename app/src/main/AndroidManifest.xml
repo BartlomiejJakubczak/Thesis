@@ -26,6 +26,8 @@
         <activity android:name=".activities.EditProfileActivity" />
         <activity android:name=".activities.EditFlatActivity" />
         <activity android:name=".activities.WelcomeActivity" />
+        <activity android:name=".activities.FlatSearchActivity" />
+        <activity android:name=".activities.WaitingActivity" />
     </application>
 
 </manifest>

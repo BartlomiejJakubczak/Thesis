@@ -32,6 +32,7 @@ import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragmentUpdated;
 import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.SwitchFlatFragment;
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                     case R.id.nav_find_flat:
                         FragmentManager findFragmentManager = getFragmentManager();
                         FragmentTransaction findFragmentTransaction = findFragmentManager.beginTransaction();
-                        FlatSearchFragment flatSearchFragment = new FlatSearchFragment();
+                        FlatSearchFragmentUpdated flatSearchFragment = new FlatSearchFragmentUpdated();
                         findFragmentTransaction.add(R.id.fragment_placeholder, flatSearchFragment, "flatSearchFragment");
                         findFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
@@ -281,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
 
     private void resetFragments() {
         CreateFlatFragment createFlatFragment = (CreateFlatFragment) getFragmentManager().findFragmentByTag("flatCreateFragment");
-        FlatSearchFragment flatSearchFragment = (FlatSearchFragment) getFragmentManager().findFragmentByTag("flatSearchFragment");
+        FlatSearchFragmentUpdated flatSearchFragment = (FlatSearchFragmentUpdated) getFragmentManager().findFragmentByTag("flatSearchFragment");
         ManageFlatFragment manageFlatFragment = (ManageFlatFragment) getFragmentManager().findFragmentByTag("manageFlatFragment");
         EditProfileFragment editProfileFragment = (EditProfileFragment) getFragmentManager().findFragmentByTag("profileEditFragment");
         NotificationsFragment notificationsFragment = (NotificationsFragment) getFragmentManager().findFragmentByTag("notificationsFragment");

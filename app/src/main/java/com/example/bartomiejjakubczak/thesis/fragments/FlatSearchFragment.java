@@ -61,66 +61,66 @@ public class FlatSearchFragment extends Fragment implements FirebaseConnection {
         flatName = view.findViewById(R.id.flats_search_editText);
         recyclerView = view.findViewById(R.id.fragment_flat_search_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        loadFlatsInformation();
+        // loadFlatsInformation();
         return view;
     }
 
-    private void loadFlatsInformation() {
-        final ArrayList<String> sentRequestFlatsKeys = new ArrayList<>();
-        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
-        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    currentSearchedUserFlatsKeys.add(ds.getKey());
-                    Log.d("FlatSearchFragment", currentSearchedUserFlatsKeys.toString());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        mCurrentUserRequestsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    sentRequestFlatsKeys.add(ds.child("flatInvolvedKey").getValue().toString());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (!currentSearchedUserFlatsKeys.contains(ds.getKey()) && !sentRequestFlatsKeys.contains(ds.getKey())) {
-                        flats.add(new Flat(ds.child("name").getValue().toString(),
-                                ds.child("address").getValue().toString(),
-                                ds.child("owner").getValue().toString(),
-                                ds.child("key").getValue().toString(),
-                                ds.child("ownerTag").getValue().toString()));
-                    }
-                }
-                flatsCopy.addAll(flats);
-                flatsSearchFragmentAdapter = new FlatsSearchFragmentAdapter(MainActivity.getContext(), flats, flatsCopy);
-                recyclerView.setAdapter(flatsSearchFragmentAdapter);
-                setEditText();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
+//    private void loadFlatsInformation() {
+//        final ArrayList<String> sentRequestFlatsKeys = new ArrayList<>();
+//        final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();
+//        mSearchedUserFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+//                    currentSearchedUserFlatsKeys.add(ds.getKey());
+//                    Log.d("FlatSearchFragment", currentSearchedUserFlatsKeys.toString());
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//        mCurrentUserRequestsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+//                    sentRequestFlatsKeys.add(ds.child("flatInvolvedKey").getValue().toString());
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//        mFlatsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+//                    if (!currentSearchedUserFlatsKeys.contains(ds.getKey()) && !sentRequestFlatsKeys.contains(ds.getKey())) {
+//                        flats.add(new Flat(ds.child("name").getValue().toString(),
+//                                ds.child("address").getValue().toString(),
+//                                ds.child("owner").getValue().toString(),
+//                                ds.child("key").getValue().toString(),
+//                                ds.child("ownerTag").getValue().toString()));
+//                    }
+//                }
+//                flatsCopy.addAll(flats);
+//                flatsSearchFragmentAdapter = new FlatsSearchFragmentAdapter(MainActivity.getContext(), flats, flatsCopy);
+//                recyclerView.setAdapter(flatsSearchFragmentAdapter);
+//                setEditText();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 
     private void setEditText() {
         flatName.addTextChangedListener(new TextWatcher() {

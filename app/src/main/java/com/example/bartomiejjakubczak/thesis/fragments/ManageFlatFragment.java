@@ -56,6 +56,7 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
     private EditText flatName;
     private ImageButton editFlatNameButton;
     private EditText flatAddress;
+    private TextView flatCode;
     private ImageButton editFlatAddressButton;
     private Button saveChangesButton;
 
@@ -121,6 +122,7 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
                 oldAddress = dataSnapshot.child("address").getValue().toString();
                 flatAddress.setText(oldAddress);
                 flatAddress.setEnabled(false);
+                flatCode.setText(dataSnapshot.child("searchCode").getValue().toString());
                 flatName.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -233,6 +235,7 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
 
         flatName = view.findViewById(R.id.flat_name_fragment);
         flatAddress = view.findViewById(R.id.flat_address_fragment);
+        flatCode = view.findViewById(R.id.flatCode_textView);
 
         editFlatNameButton = view.findViewById(R.id.edit_flat_name_button);
         editFlatAddressButton = view.findViewById(R.id.edit_flat_address_button);

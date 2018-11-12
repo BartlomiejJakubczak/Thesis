@@ -134,8 +134,13 @@ Also, you should consider removing shared prefs which are mutable, so things lik
 
 Deleting works, now you should handle situation in which the user was already browsing the flat from which he was deleted.
 
+Option with creating flat when user ha none (even when already browsing app) is done, now joining existing flat needs fixing.
+Look into it. Also, flat searching might be bugged, try to type in the flat which was deleted after deleting to check if it really works.
+
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
+- change notification icon when there are notifications pending
+- user tag is "no flat yet" in notifications when sent
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)

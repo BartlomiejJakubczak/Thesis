@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -18,6 +19,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private TextView explanation2;
     private Button joinFlat;
     private Button createFlat;
+    private Button signOut;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,17 +30,29 @@ public class WelcomeActivity extends AppCompatActivity {
         explanation2 = findViewById(R.id.explanation2);
         joinFlat = findViewById(R.id.join_flat_button);
         createFlat = findViewById(R.id.create_flat_button);
+        signOut = findViewById(R.id.signout_out_button_welcome);
 
         joinFlat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), FlatSearchActivity.class);
+                finish();
+                startActivity(intent);
             }
         });
         createFlat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), CreateFlatActivity.class);
+                finish();
+                startActivity(intent);
+            }
+        });
+        signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
                 finish();
                 startActivity(intent);
             }

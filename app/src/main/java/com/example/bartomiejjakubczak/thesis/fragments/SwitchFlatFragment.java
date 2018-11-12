@@ -65,6 +65,7 @@ public class SwitchFlatFragment extends Fragment implements SharedPrefs, Firebas
                                 ds.child("address").getValue().toString(),
                                 ds.child("owner").getValue().toString(),
                                 ds.child("key").getValue().toString(),
+                                ds.child("searchCode").getValue().toString(),
                                 ds.child("ownerTag").getValue().toString()));
                     }
                 }
