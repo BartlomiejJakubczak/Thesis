@@ -147,6 +147,7 @@ try to test it still, but concentrate on creating at least 1 functionality.
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
+- possibly change starting activity to MainActivity
 - change notification icon when there are notifications pending
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)

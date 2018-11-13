@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         setContentView(R.layout.activity_main);
         setViews();
         setDrawer();
+        setCurrentUserFlatsPrefs();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -102,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_address), getString(R.string.shared_prefs_default));
                     }
                     putStringToSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_user_email), currentUserEmail);
-                    setCurrentUserFlatsPrefs();
                 } else {
                     Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
                     finish();
@@ -313,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         } else if (foodShareFragment != null && foodShareFragment.isVisible()) {
             setFunctionalitiesFragmentNoBacktrace();
         } else if (createFoodShareFragment != null && createFoodShareFragment.isVisible()) {
-        setFunctionalitiesFragmentNoBacktrace();
+            setFunctionalitiesFragmentNoBacktrace();
         }
     }
 
@@ -429,5 +430,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         if (mFlatRemovalListener != null) {
             mUsersFlatsDatabaseReference.child(currentUserEmail).removeEventListener(mFlatRemovalListener);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
