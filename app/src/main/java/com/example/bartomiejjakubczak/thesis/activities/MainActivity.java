@@ -29,10 +29,12 @@ import com.example.bartomiejjakubczak.thesis.dialogs.CreateFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.dialogs.DeleteFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.dialogs.SwitchFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.CreateFoodShareFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragmentUpdated;
+import com.example.bartomiejjakubczak.thesis.fragments.FoodShareFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FunctionalitiesFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
@@ -252,16 +254,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mDrawerLayout.addDrawerListener(mDrawerListener);
     }
 
-    @Override
-    public void putStringToSharedPrefs(Context context, String label, String string) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
-    }
-
-    @Override
-    public String loadStringFromSharedPrefs(Context context, String label) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
-    }
-
     private void updateUI() {
         mFlatsDatabaseReference
                 .child(loadStringFromSharedPrefs(getApplicationContext(), getString(R.string.shared_prefs_flat_key)))
@@ -288,6 +280,14 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         fragmentTransaction.commit();
     }
 
+    private void setFunctionalitiesFragmentNoBacktrace() {
+        FunctionalitiesFragment functionalitiesFragment = new FunctionalitiesFragment();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_placeholder, functionalitiesFragment, "functionalitiesFragment");
+        getFragmentManager().popBackStack("functionalitiesFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fragmentTransaction.commit();
+    }
+
     private void resetFragments() {
         CreateFlatFragment createFlatFragment = (CreateFlatFragment) getFragmentManager().findFragmentByTag("flatCreateFragment");
         FlatSearchFragmentUpdated flatSearchFragment = (FlatSearchFragmentUpdated) getFragmentManager().findFragmentByTag("flatSearchFragment");
@@ -295,6 +295,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         EditProfileFragment editProfileFragment = (EditProfileFragment) getFragmentManager().findFragmentByTag("profileEditFragment");
         NotificationsFragment notificationsFragment = (NotificationsFragment) getFragmentManager().findFragmentByTag("notificationsFragment");
         SwitchFlatFragment switchFlatFragment = (SwitchFlatFragment) getFragmentManager().findFragmentByTag("switchFlatFragment");
+        FoodShareFragment foodShareFragment = (FoodShareFragment) getFragmentManager().findFragmentByTag("foodShareFragment");
+        CreateFoodShareFragment createFoodShareFragment = (CreateFoodShareFragment) getFragmentManager().findFragmentByTag("createFoodShareFragment");
 
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
             setFunctionalitiesFragment();
@@ -308,6 +310,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             setFunctionalitiesFragment();
         } else if (switchFlatFragment != null && switchFlatFragment.isVisible()) {
             setFunctionalitiesFragment();
+        } else if (foodShareFragment != null && foodShareFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (createFoodShareFragment != null && createFoodShareFragment.isVisible()) {
+        setFunctionalitiesFragmentNoBacktrace();
         }
     }
 
@@ -386,6 +392,16 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     public void initializeFirebaseComponents() {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+    }
+
+    @Override
+    public void putStringToSharedPrefs(Context context, String label, String string) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(label, string).apply();
+    }
+
+    @Override
+    public String loadStringFromSharedPrefs(Context context, String label) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(label, getString(R.string.shared_prefs_default));
     }
 
     public static Context getContext() {

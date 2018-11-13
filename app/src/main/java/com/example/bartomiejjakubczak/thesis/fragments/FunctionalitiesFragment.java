@@ -1,6 +1,7 @@
 package com.example.bartomiejjakubczak.thesis.fragments;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -27,7 +28,11 @@ public class FunctionalitiesFragment extends Fragment {
         foodShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // zamiana fragmentu na fragment foodshare z opcja powrotu do maina
+                FoodShareFragment foodShareFragment = new FoodShareFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_placeholder, foodShareFragment, "foodShareFragment");
+                fragmentTransaction.addToBackStack("functionalitiesFragment");
+                fragmentTransaction.commit();
             }
         });
         return view;
