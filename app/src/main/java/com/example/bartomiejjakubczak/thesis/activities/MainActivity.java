@@ -33,6 +33,7 @@ import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragmentUpdated;
+import com.example.bartomiejjakubczak.thesis.fragments.FunctionalitiesFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.SwitchFlatFragment;
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         FragmentManager createFragmentManager = getFragmentManager();
                         FragmentTransaction createFragmentTransaction = createFragmentManager.beginTransaction();
                         CreateFlatFragment flatCreateFragment = new CreateFlatFragment();
-                        createFragmentTransaction.add(R.id.fragment_placeholder, flatCreateFragment, "flatCreateFragment");
+                        createFragmentTransaction.replace(R.id.fragment_placeholder, flatCreateFragment, "flatCreateFragment");
                         createFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
@@ -194,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         FragmentManager editProfileFragmentManager = getFragmentManager();
                         FragmentTransaction editProfileFragmentTransaction = editProfileFragmentManager.beginTransaction();
                         EditProfileFragment editProfileFragment = new EditProfileFragment();
-                        editProfileFragmentTransaction.add(R.id.fragment_placeholder, editProfileFragment, "profileEditFragment");
+                        editProfileFragmentTransaction.replace(R.id.fragment_placeholder, editProfileFragment, "profileEditFragment");
                         editProfileFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         FragmentManager manageFragmentManager = getFragmentManager();
                         FragmentTransaction manageFragmentTransaction = manageFragmentManager.beginTransaction();
                         ManageFlatFragment manageFlatFragment = new ManageFlatFragment();
-                        manageFragmentTransaction.add(R.id.fragment_placeholder, manageFlatFragment, "manageFlatFragment");
+                        manageFragmentTransaction.replace(R.id.fragment_placeholder, manageFlatFragment, "manageFlatFragment");
                         manageFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
@@ -210,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         FragmentManager switchFragmentManager = getFragmentManager();
                         FragmentTransaction switchFragmentTransaction = switchFragmentManager.beginTransaction();
                         SwitchFlatFragment switchFlatFragment = new SwitchFlatFragment();
-                        switchFragmentTransaction.add(R.id.fragment_placeholder, switchFlatFragment, "switchFlatFragment");
+                        switchFragmentTransaction.replace(R.id.fragment_placeholder, switchFlatFragment, "switchFlatFragment");
                         switchFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
@@ -218,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                         FragmentManager findFragmentManager = getFragmentManager();
                         FragmentTransaction findFragmentTransaction = findFragmentManager.beginTransaction();
                         FlatSearchFragmentUpdated flatSearchFragment = new FlatSearchFragmentUpdated();
-                        findFragmentTransaction.add(R.id.fragment_placeholder, flatSearchFragment, "flatSearchFragment");
+                        findFragmentTransaction.replace(R.id.fragment_placeholder, flatSearchFragment, "flatSearchFragment");
                         findFragmentTransaction.commit();
                         mDrawerLayout.closeDrawer(Gravity.START, true);
                         return true;
@@ -280,6 +281,13 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         });
     }
 
+    private void setFunctionalitiesFragment() {
+        FunctionalitiesFragment functionalitiesFragment = new FunctionalitiesFragment();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_placeholder, functionalitiesFragment, "functionalitiesFragment");
+        fragmentTransaction.commit();
+    }
+
     private void resetFragments() {
         CreateFlatFragment createFlatFragment = (CreateFlatFragment) getFragmentManager().findFragmentByTag("flatCreateFragment");
         FlatSearchFragmentUpdated flatSearchFragment = (FlatSearchFragmentUpdated) getFragmentManager().findFragmentByTag("flatSearchFragment");
@@ -289,35 +297,17 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         SwitchFlatFragment switchFlatFragment = (SwitchFlatFragment) getFragmentManager().findFragmentByTag("switchFlatFragment");
 
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(flatSearchFragment);
-            fragmentTransaction.commit();
+            setFunctionalitiesFragment();
         } else if (createFlatFragment != null && createFlatFragment.isVisible()) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(createFlatFragment);
-            fragmentTransaction.commit();
+            setFunctionalitiesFragment();
         } else if (manageFlatFragment != null && manageFlatFragment.isVisible()) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(manageFlatFragment);
-            fragmentTransaction.commit();
+            setFunctionalitiesFragment();
         } else if (editProfileFragment != null && editProfileFragment.isVisible()) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(editProfileFragment);
-            fragmentTransaction.commit();
+            setFunctionalitiesFragment();
         } else if (notificationsFragment != null && notificationsFragment.isVisible()) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(notificationsFragment);
-            fragmentTransaction.commit();
+            setFunctionalitiesFragment();
         } else if (switchFlatFragment != null && switchFlatFragment.isVisible()) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(switchFlatFragment);
-            fragmentTransaction.commit();
+            setFunctionalitiesFragment();
         }
     }
 
@@ -355,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                             break;
                         }
                     }
+                    setFunctionalitiesFragment();
                     mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                     mActionBar.setDisplayHomeAsUpEnabled(true);
                     setListenerForFlatRemoval();
@@ -366,9 +357,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 }
             });
         } else {
-            setListenerForFlatRemoval();
+            setFunctionalitiesFragment();
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             mActionBar.setDisplayHomeAsUpEnabled(true);
+            setListenerForFlatRemoval();
         }
     }
 

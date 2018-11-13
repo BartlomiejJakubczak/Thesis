@@ -139,8 +139,14 @@ Look into it. Also, flat searching might be bugged, try to type in the flat whic
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------13.11.2018------------------------------------------------------------
+
+Flat managing should now work more or less correctly (database also should be more or less correctly wired up),
+try to test it still, but concentrate on creating at least 1 functionality.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 ISSUES:
 - change notification icon when there are notifications pending
-- user tag is "no flat yet" in notifications when sent
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)
