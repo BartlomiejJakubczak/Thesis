@@ -147,6 +147,7 @@ try to test it still, but concentrate on creating at least 1 functionality.
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
+- all fragments have to reset when drawer is being opened
 - date validation doesnt work when creating and edititng foodshare
 - make sure to check input data like date and quantities if they make sense (everywhere)
 - change notification icon when there are notifications pending

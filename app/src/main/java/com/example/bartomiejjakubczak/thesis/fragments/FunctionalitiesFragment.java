@@ -14,6 +14,7 @@ import com.example.bartomiejjakubczak.thesis.R;
 public class FunctionalitiesFragment extends Fragment {
 
     private Button foodShareButton;
+    private Button groceryButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,12 +26,23 @@ public class FunctionalitiesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.functionalities_fragment, container, false);
         foodShareButton = view.findViewById(R.id.foodShare_button);
+        groceryButton = view.findViewById(R.id.grocery_button);
         foodShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FoodShareFragment foodShareFragment = new FoodShareFragment();
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_placeholder, foodShareFragment, "foodShareFragment");
+                fragmentTransaction.addToBackStack("functionalitiesFragment");
+                fragmentTransaction.commit();
+            }
+        });
+        groceryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GroceryPendingFragment groceryPendingFragment = new GroceryPendingFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_placeholder, groceryPendingFragment, "groceryPendingFragment");
                 fragmentTransaction.addToBackStack("functionalitiesFragment");
                 fragmentTransaction.commit();
             }
