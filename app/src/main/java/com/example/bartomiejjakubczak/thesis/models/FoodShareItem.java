@@ -1,5 +1,7 @@
 package com.example.bartomiejjakubczak.thesis.models;
 
+import android.icu.text.StringPrepParseException;
+
 import java.security.SecureRandom;
 
 public class FoodShareItem {
@@ -7,25 +9,37 @@ public class FoodShareItem {
     private String key;
     private String name;
     private String quantity;
+    private String expirationDate;
     private String photoURI;
 
-    public FoodShareItem(String name, String quantity) {
+    public FoodShareItem(String name, String quantity, String expirationDate) {
         this.name = name;
         this.quantity = quantity;
+        this.expirationDate = expirationDate;
         this.key = generateKey(20);
         this.photoURI = null;
     }
 
-    public FoodShareItem(String name, String quantity, String photoURI) {
+    public FoodShareItem(String name, String quantity, String expirationDate, String photoURI) {
         this.name = name;
         this.quantity = quantity;
+        this.expirationDate = expirationDate;
         this.key = generateKey(20);
         this.photoURI = photoURI;
     }
 
-    public FoodShareItem(String name, String quantity, String photoURI, String key) {
+    public FoodShareItem(String name, String quantity, String expirationDate, String key, int something) {
         this.name = name;
         this.quantity = quantity;
+        this.expirationDate = expirationDate;
+        this.key = key;
+        this.photoURI = null;
+    }
+
+    public FoodShareItem(String name, String quantity, String expirationDate, String photoURI, String key) {
+        this.name = name;
+        this.quantity = quantity;
+        this.expirationDate = expirationDate;
         this.key = key;
         this.photoURI = photoURI;
     }
@@ -54,5 +68,13 @@ public class FoodShareItem {
 
     public String getPhotoURI() {
         return photoURI;
+    }
+
+    public String getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setPhotoURI(String photoURI) {
+        this.photoURI = photoURI;
     }
 }

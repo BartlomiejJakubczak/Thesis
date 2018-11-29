@@ -22,15 +22,31 @@
 
     <EditText
         android:id="@+id/foodshare_quantity"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Quantity"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/foodshare_name" />
+
+    <EditText
+        android:id="@+id/foodshare_expiration"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="date"
+        android:hint="Expiration date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/foodshare_quantity" />
 
     <ImageView
         android:id="@+id/foodshare_imageView"
@@ -55,7 +71,7 @@
         android:layout_marginTop="8dp"
         android:text="add photo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/foodshare_quantity" />
+        app:layout_constraintTop_toBottomOf="@+id/foodshare_expiration" />
 
     <Button
         android:id="@+id/save_foodshare"
@@ -68,5 +84,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/optional"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="*Optional"
+        app:layout_constraintBottom_toBottomOf="@+id/add_photo"
+        app:layout_constraintStart_toEndOf="@+id/add_photo"
+        app:layout_constraintTop_toTopOf="@+id/add_photo" />
 
 </android.support.constraint.ConstraintLayout>

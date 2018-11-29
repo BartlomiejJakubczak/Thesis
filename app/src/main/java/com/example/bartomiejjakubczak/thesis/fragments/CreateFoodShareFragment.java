@@ -54,12 +54,14 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
 
     private EditText foodName;
     private EditText foodQuantity;
+    private EditText foodExpiration;
     private Button addPhotoButton;
     private Button saveButton;
     private ImageView photoImageView;
 
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseStorage mStorage;
+    private StorageReference photoRef;
     private DatabaseReference mFoodShareDatabaseReference;
 
     private File createImageFile() throws IOException {
@@ -125,12 +127,12 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     private void savePicInFirebaseStorage(String foodShareKey) {
         File f = new File(mCurrentPhotoPath);
         Uri contentUri = Uri.fromFile(f);
-        StorageReference riversRef = mStorage.getReference().child("images/FoodShare/" + loadStringFromSharedPrefs(getActivity(), "flat_key") + "/ " + foodShareKey);
-        UploadTask uploadTask = riversRef.putFile(contentUri);
+        photoRef = mStorage.getReference().child("images/FoodShare/" + loadStringFromSharedPrefs(getActivity(), "flat_key") + "/" + foodShareKey);
+        UploadTask uploadTask = photoRef.putFile(contentUri);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getActivity(), "Picture successfully uploaded", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Picture successfully uploaded", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -140,10 +142,11 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
         return "".equals(testString);
     }
 
-    private void saveInfoInDatabase(String name, String quantity, String photoURI) {
+    private void saveInfoInDatabase(String name, String quantity, String expirationDate, String photoURI) {
 
         boolean validName;
         boolean validQuantity;
+        boolean validDate;
 
         if (checkIfEmpty(name)) {
             foodName.setError("This field cannot be blank");
@@ -159,11 +162,17 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
             validQuantity = true;
         }
 
-        Log.i(TAG, validName + " " + validQuantity + " " + isPic + " " + mCurrentPhotoPath.isEmpty() + mCurrentPhotoPath);
+        if (checkIfEmpty(expirationDate)) {
+            foodExpiration.setError("This field cannot be blank");
+            validDate = false;
+        } else {
+            validDate = true;
+        }
 
-        if (validName && validQuantity && isPic) {
+        if (validName && validQuantity && validDate && isPic) {
             saveButton.setEnabled(false);
-            final FoodShareItem foodShareItem = new FoodShareItem(name, quantity, photoURI);
+            final FoodShareItem foodShareItem = new FoodShareItem(name, quantity, expirationDate, photoURI);
+            foodShareItem.setPhotoURI(photoURI + "/" + foodShareItem.getKey());
             mFoodShareDatabaseReference.child(loadStringFromSharedPrefs(getActivity(), "flat_key")).child(foodShareItem.getKey()).setValue(foodShareItem).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -171,28 +180,31 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
                     Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
                     foodName.setText("");
                     foodQuantity.setText("");
+                    foodExpiration.setText("");
                     photoImageView.setImageResource(R.drawable.ic_photo_camera);
                     isPic = false;
                     savePicInFirebaseStorage(foodShareItem.getKey());
                 }
             });
 
-        } else if (validName && validQuantity && !isPic) {
+        } else if (validName && validQuantity && validDate && !isPic) {
             saveButton.setEnabled(false);
-            FoodShareItem foodShareItem = new FoodShareItem(name, quantity);
+            FoodShareItem foodShareItem = new FoodShareItem(name, quantity, expirationDate);
             mFoodShareDatabaseReference.child(loadStringFromSharedPrefs(getActivity(), "flat_key")).child(foodShareItem.getKey()).setValue(foodShareItem).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     saveButton.setEnabled(true);
                     foodName.setText("");
                     foodQuantity.setText("");
+                    foodExpiration.setText("");
                     Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
                 }
             });
-        } else if (!validName && !validQuantity && isPic) {
+        } else if (!validName && !validQuantity && !validDate && isPic) {
             saveButton.setEnabled(false);
             foodName.setError("This field cannot be blank");
             foodQuantity.setError("This field cannot be blank");
+            foodExpiration.setError("This field cannot be blank");
             saveButton.setEnabled(true);
         }
 
@@ -222,6 +234,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
         View view = inflater.inflate(R.layout.fragment_create_foodshare, container, false);
         foodName = view.findViewById(R.id.foodshare_name);
         foodQuantity = view.findViewById(R.id.foodshare_quantity);
+        foodExpiration = view.findViewById(R.id.foodshare_expiration);
         photoImageView = view.findViewById(R.id.foodshare_imageView);
 
         addPhotoButton = view.findViewById(R.id.add_photo);
@@ -240,7 +253,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveInfoInDatabase(foodName.getText().toString(), foodQuantity.getText().toString(), mCurrentPhotoPath);
+                saveInfoInDatabase(foodName.getText().toString(), foodQuantity.getText().toString(), foodExpiration.getText().toString(), photoRef.getPath());
             }
         });
         return view;
@@ -255,6 +268,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mFoodShareDatabaseReference = mFirebaseDatabase.getReference().child("foodShare");
+        photoRef = mStorage.getReference().child("images/FoodShare/" + loadStringFromSharedPrefs(getActivity(), "flat_key"));
     }
 
     @Override
