@@ -45,7 +45,7 @@ public class FoodShareFragmentAdapter extends RecyclerView.Adapter<FoodShareFrag
     public void onBindViewHolder(@NonNull final FoodShareFragmentHolder holder, int position) {
         holder.name.setText(foodShareItems.get(position).getName());
         holder.quantity.setText(foodShareItems.get(position).getQuantity());
-        holder.infoButton.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();

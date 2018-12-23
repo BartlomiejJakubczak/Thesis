@@ -1,6 +1,6 @@
 package com.example.bartomiejjakubczak.thesis.activities;
 
-import android.app.DialogFragment;
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -21,30 +20,27 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
-import com.example.bartomiejjakubczak.thesis.adapters.FlatsSearchFragmentAdapter;
-import com.example.bartomiejjakubczak.thesis.dialogs.CreateFlatDialogFragment;
-import com.example.bartomiejjakubczak.thesis.dialogs.DeleteFlatDialogFragment;
-import com.example.bartomiejjakubczak.thesis.dialogs.SwitchFlatDialogFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFoodShareFragment;
-import com.example.bartomiejjakubczak.thesis.fragments.EditFlatFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.CreateGroceryFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.EditProfileFragment;
-import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragmentUpdated;
 import com.example.bartomiejjakubczak.thesis.fragments.FoodShareFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.FoodShareFragmentInfo;
 import com.example.bartomiejjakubczak.thesis.fragments.FunctionalitiesFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.GroceryListBoughtFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.GroceryFragmentInfo;
+import com.example.bartomiejjakubczak.thesis.fragments.GroceryPendingFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.SwitchFlatFragment;
-import com.example.bartomiejjakubczak.thesis.interfaces.DeleteDialogCloseListener;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
-import com.example.bartomiejjakubczak.thesis.models.Flat;
-import com.example.bartomiejjakubczak.thesis.utilities.TinyDB;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -133,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
                 notificationsFragmentTransaction.replace(R.id.fragment_placeholder, notificationsFragment, "notificationsFragment");
                 notificationsFragmentTransaction.commit();
+                return true;
+            case R.id.home_menu:
+                setFunctionalitiesFragmentNoBacktrace();
                 return true;
             case android.R.id.home:
                 if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
@@ -234,7 +233,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         mDrawerListener = new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
+                InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(Activity.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
 
             @Override
@@ -298,6 +298,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         SwitchFlatFragment switchFlatFragment = (SwitchFlatFragment) getFragmentManager().findFragmentByTag("switchFlatFragment");
         FoodShareFragment foodShareFragment = (FoodShareFragment) getFragmentManager().findFragmentByTag("foodShareFragment");
         CreateFoodShareFragment createFoodShareFragment = (CreateFoodShareFragment) getFragmentManager().findFragmentByTag("createFoodShareFragment");
+        FoodShareFragmentInfo foodShareFragmentInfo = (FoodShareFragmentInfo) getFragmentManager().findFragmentByTag("foodShareFragmentInfo");
+        GroceryPendingFragment groceryPendingFragment = (GroceryPendingFragment) getFragmentManager().findFragmentByTag("groceryPendingFragment");
+        CreateGroceryFragment createGroceryFragment = (CreateGroceryFragment) getFragmentManager().findFragmentByTag("createGroceryFragment");
+        GroceryFragmentInfo groceryFragmentInfo = (GroceryFragmentInfo) getFragmentManager().findFragmentByTag("groceryFragmentInfo");
+        GroceryListBoughtFragment groceryListBoughtFragment = (GroceryListBoughtFragment) getFragmentManager().findFragmentByTag("groceryListBoughtFragment");
 
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
             setFunctionalitiesFragment();
@@ -314,6 +319,16 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         } else if (foodShareFragment != null && foodShareFragment.isVisible()) {
             setFunctionalitiesFragmentNoBacktrace();
         } else if (createFoodShareFragment != null && createFoodShareFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (foodShareFragmentInfo != null && foodShareFragmentInfo.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (groceryPendingFragment != null && groceryPendingFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (createGroceryFragment != null && createGroceryFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (groceryFragmentInfo != null && groceryFragmentInfo.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (groceryListBoughtFragment != null && groceryListBoughtFragment.isVisible()) {
             setFunctionalitiesFragmentNoBacktrace();
         }
     }

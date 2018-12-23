@@ -20,6 +20,15 @@ public class GroceryItem {
         this.date = date;
     }
 
+    public GroceryItem(String key, String name, String quantity, String notes, String addingPersonKey, String date) {
+        this.key = key;
+        this.name = name;
+        this.quantity = quantity;
+        this.notes = notes;
+        this.addingPersonKey = addingPersonKey;
+        this.date = date;
+    }
+
 
     public String getName() {
         return name;

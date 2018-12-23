@@ -35,6 +35,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,10 +65,34 @@ public class FoodShareFragmentInfo extends Fragment implements FirebaseConnectio
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mFoodShareDatabaseReference;
 
-    private boolean isDateValid(String date) {
-        String reFormat = Pattern.compile("d+|M+").matcher(Matcher.quoteReplacement("d/MM/yy")).replaceAll("\\\\d{1,2}");
-        reFormat = Pattern.compile("y+").matcher(reFormat).replaceAll("\\\\d{4}");
-        return Pattern.compile(reFormat).matcher(date).matches();
+    private boolean isDateValid(String value) {
+        Date date = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+            date = sdf.parse(value);
+            if (!value.equals(sdf.format(date))) {
+                date = null;
+            }
+        } catch (ParseException ex) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                date = sdf.parse(value);
+                if (!value.equals(sdf.format(date))) {
+                    date = null;
+                }
+            } catch (ParseException ex2) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+                    date = sdf.parse(value);
+                    if (!value.equals(sdf.format(date))) {
+                        date = null;
+                    }
+                } catch (ParseException ex3) {
+                    ex3.printStackTrace();
+                }
+            }
+        }
+        return date != null;
     }
 
     private void setButtons() {
@@ -291,6 +319,7 @@ public class FoodShareFragmentInfo extends Fragment implements FirebaseConnectio
         super.onCreate(savedInstanceState);
         thisFragment = this;
         initializeFirebaseComponents();
+        foodShareKey = getArguments().getString("foodshare_key");
         initializeFirebaseDatabaseReferences(FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", ""));
     }
 
@@ -298,16 +327,15 @@ public class FoodShareFragmentInfo extends Fragment implements FirebaseConnectio
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.foodshare_info, container, false);
-        name = view.findViewById(R.id.foodshare_name_info);
-        quantity = view.findViewById(R.id.foodshare_quantity_info);
-        expiration = view.findViewById(R.id.foodshare_expiration_info);
-        editName = view.findViewById(R.id.edit_foodshare_name);
-        editQuantity = view.findViewById(R.id.edit_foodshare_quantity);
-        editExpiration = view.findViewById(R.id.edit_foodshare_expirationdate);
-        saveChangesButton = view.findViewById(R.id.savechanges_button);
+        name = view.findViewById(R.id.grocery_name_info);
+        quantity = view.findViewById(R.id.grocery_quantity_info);
+        expiration = view.findViewById(R.id.grocery_notes_info);
+        editName = view.findViewById(R.id.edit_grocery_name);
+        editQuantity = view.findViewById(R.id.edit_grocery_quantity);
+        editExpiration = view.findViewById(R.id.edit_grocery_notes);
+        saveChangesButton = view.findViewById(R.id.savechanges_grocery_button);
         photo = view.findViewById(R.id.foodshare_photo_info);
-        deleteButton = view.findViewById(R.id.deleteFoodShare_button);
-        foodShareKey = getArguments().getString("foodshare_key");
+        deleteButton = view.findViewById(R.id.delete_grocery_button);
         loadData(foodShareKey);
         setButtons();
         return view;

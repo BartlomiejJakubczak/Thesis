@@ -14,12 +14,10 @@ public class FoodShareFragmentHolder extends RecyclerView.ViewHolder {
 
     TextView name;
     TextView quantity;
-    ImageButton infoButton;
 
     public FoodShareFragmentHolder(View itemView) {
         super(itemView);
         name = itemView.findViewById(R.id.model_foodShare_name);
         quantity = itemView.findViewById(R.id.model_foodShare_quantity);
-        infoButton = itemView.findViewById(R.id.edit_foodShare_button);
     }
 }

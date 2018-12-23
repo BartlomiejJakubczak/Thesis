@@ -147,9 +147,10 @@ try to test it still, but concentrate on creating at least 1 functionality.
 ----------------------------------------------------------------------------------------------------------------------------------
 
 ISSUES:
-- all fragments have to reset when drawer is being opened
-- date validation doesnt work when creating and edititng foodshare
-- make sure to check input data like date and quantities if they make sense (everywhere)
+- since you cant place recyclerview and photo on the same view, think of a way how you want to play this out (maybe showing list in dialogfragment?) in "completed" section you will show only receipt
+- keyboard moves some buttons up, fix it (https://stackoverflow.com/questions/4301422/android-showing-keyboard-moves-my-components-up-i-want-to-hide-them-instead)
+- remember to replace info buttons on view holders with tapping those items for info
+- I managed to perform real time addition to items in recycler view in GroceryPendingFragment (use this as future reference for upgrading your app if there will be time left)
 - change notification icon when there are notifications pending
 - create a refresh button for flat searching fragment (or not - maybe you could listen for values at realtime with firebase)
 - solve the problem of firebase session expiration (it bugs when the auth token is no longer valid)

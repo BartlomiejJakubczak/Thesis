@@ -4,19 +4,15 @@
     <item
         android:id="@+id/action_pending"
         android:enabled="true"
+        android:checkable="true"
         android:title="Pending"
         android:icon="@drawable/ic_shopping_basket"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_completed"
         android:enabled="true"
+        android:checkable="true"
         android:title="Completed"
         android:icon="@drawable/ic_done"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_history"
-        android:enabled="true"
-        android:title="History"
-        android:icon="@drawable/ic_history"
         app:showAsAction="ifRoom"/>
 </menu>

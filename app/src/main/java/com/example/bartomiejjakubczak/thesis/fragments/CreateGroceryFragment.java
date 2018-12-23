@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -49,6 +50,8 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_grocery, container, false);
+        InputMethodManager inputManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         name = view.findViewById(R.id.grocery_name);
         quantity = view.findViewById(R.id.grocery_quantity);
         notes = view.findViewById(R.id.grocery_notes);
@@ -67,8 +70,8 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
                     String stringDate = simpleDateFormat.format(newDate);
                     GroceryItem newItem = new GroceryItem(groceryName, groceryQuantity, groceryNotes, currentUserKey, stringDate);
                     mGroceryDatabaseReference
-                            .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)))
                             .child("pendingGrocery")
+                            .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)))
                             .child(newItem.getKey())
                             .setValue(newItem)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {

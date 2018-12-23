@@ -41,8 +41,10 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class CreateFoodShareFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
@@ -132,7 +134,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                //Toast.makeText(getActivity(), "Picture successfully uploaded", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -142,8 +144,37 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
         return "".equals(testString);
     }
 
-    private void saveInfoInDatabase(String name, String quantity, String expirationDate, String photoURI) {
+    private boolean checkIfValidDate(String value) {
+        Date date = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+            date = sdf.parse(value);
+            if (!value.equals(sdf.format(date))) {
+                date = null;
+            }
+        } catch (ParseException ex) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                date = sdf.parse(value);
+                if (!value.equals(sdf.format(date))) {
+                    date = null;
+                }
+            } catch (ParseException ex2) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+                    date = sdf.parse(value);
+                    if (!value.equals(sdf.format(date))) {
+                        date = null;
+                    }
+                } catch (ParseException ex3) {
+                    ex3.printStackTrace();
+                }
+            }
+        }
+        return date != null;
+    }
 
+    private void saveInfoInDatabase(String name, String quantity, String expirationDate, String photoURI) {
         boolean validName;
         boolean validQuantity;
         boolean validDate;
@@ -162,11 +193,11 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
             validQuantity = true;
         }
 
-        if (checkIfEmpty(expirationDate)) {
-            foodExpiration.setError("This field cannot be blank");
-            validDate = false;
-        } else {
+        if (checkIfValidDate(expirationDate)) {
             validDate = true;
+        } else {
+            validDate = false;
+            foodExpiration.setError("The date is not valid");
         }
 
         if (validName && validQuantity && validDate && isPic) {
@@ -176,30 +207,26 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
             mFoodShareDatabaseReference.child(loadStringFromSharedPrefs(getActivity(), "flat_key")).child(foodShareItem.getKey()).setValue(foodShareItem).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    saveButton.setEnabled(true);
-                    Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
-                    foodName.setText("");
-                    foodQuantity.setText("");
-                    foodExpiration.setText("");
-                    photoImageView.setImageResource(R.drawable.ic_photo_camera);
-                    isPic = false;
                     savePicInFirebaseStorage(foodShareItem.getKey());
                 }
             });
+            saveButton.setEnabled(true);
+            Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
+            foodName.setText("");
+            foodQuantity.setText("");
+            foodExpiration.setText("");
+            photoImageView.setImageResource(R.drawable.ic_photo_camera);
+            isPic = false;
 
         } else if (validName && validQuantity && validDate && !isPic) {
             saveButton.setEnabled(false);
             FoodShareItem foodShareItem = new FoodShareItem(name, quantity, expirationDate);
-            mFoodShareDatabaseReference.child(loadStringFromSharedPrefs(getActivity(), "flat_key")).child(foodShareItem.getKey()).setValue(foodShareItem).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    saveButton.setEnabled(true);
-                    foodName.setText("");
-                    foodQuantity.setText("");
-                    foodExpiration.setText("");
-                    Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
-                }
-            });
+            mFoodShareDatabaseReference.child(loadStringFromSharedPrefs(getActivity(), "flat_key")).child(foodShareItem.getKey()).setValue(foodShareItem);
+            saveButton.setEnabled(true);
+            foodName.setText("");
+            foodQuantity.setText("");
+            foodExpiration.setText("");
+            Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
         } else if (!validName && !validQuantity && !validDate && isPic) {
             saveButton.setEnabled(false);
             foodName.setError("This field cannot be blank");
@@ -214,7 +241,6 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            Log.i(TAG, "onActivityResult called");
             setPic();
             galleryAddPic();
         }
