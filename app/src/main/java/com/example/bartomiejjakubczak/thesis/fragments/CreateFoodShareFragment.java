@@ -258,7 +258,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_foodshare, container, false);
-        foodName = view.findViewById(R.id.foodshare_name);
+        foodName = view.findViewById(R.id.chore_name);
         foodQuantity = view.findViewById(R.id.foodshare_quantity);
         foodExpiration = view.findViewById(R.id.foodshare_expiration);
         photoImageView = view.findViewById(R.id.foodshare_imageView);

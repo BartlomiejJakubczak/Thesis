@@ -15,6 +15,7 @@ public class FunctionalitiesFragment extends Fragment {
 
     private Button foodShareButton;
     private Button groceryButton;
+    private Button choresButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class FunctionalitiesFragment extends Fragment {
         View view = inflater.inflate(R.layout.functionalities_fragment, container, false);
         foodShareButton = view.findViewById(R.id.foodShare_button);
         groceryButton = view.findViewById(R.id.grocery_button);
+        choresButton = view.findViewById(R.id.chores_button);
         foodShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,6 +45,16 @@ public class FunctionalitiesFragment extends Fragment {
                 GroceryPendingFragment groceryPendingFragment = new GroceryPendingFragment();
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_placeholder, groceryPendingFragment, "groceryPendingFragment");
+                fragmentTransaction.addToBackStack("functionalitiesFragment");
+                fragmentTransaction.commit();
+            }
+        });
+        choresButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChoresFragment choresFragment = new ChoresFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_placeholder, choresFragment, "choresFragment");
                 fragmentTransaction.addToBackStack("functionalitiesFragment");
                 fragmentTransaction.commit();
             }

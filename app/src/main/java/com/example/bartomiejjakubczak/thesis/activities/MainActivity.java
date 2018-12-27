@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
+import com.example.bartomiejjakubczak.thesis.fragments.AssignPersonFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFoodShareFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateGroceryFragment;

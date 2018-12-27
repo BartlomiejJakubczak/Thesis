@@ -9,92 +9,66 @@
     <EditText
         android:id="@+id/chore_name"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Name"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/foodshare_quantity"
+        android:id="@+id/chore_notes"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Quantity"
-        android:inputType="textPersonName"
+        android:hint="Notes"
+        android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chore_name" />
+        app:layout_constraintTop_toBottomOf="@+id/chore_dueDate" />
 
     <EditText
-        android:id="@+id/foodshare_expiration"
+        android:id="@+id/chore_dueDate"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Due Date"
         android:inputType="date"
-        android:hint="Expiration date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/foodshare_quantity" />
-
-    <ImageView
-        android:id="@+id/foodshare_imageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/save_foodshare"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_photo"
-        app:srcCompat="@drawable/ic_photo_camera" />
+        app:layout_constraintTop_toBottomOf="@+id/chore_name" />
 
     <Button
-        android:id="@+id/add_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="add photo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/foodshare_expiration" />
-
-    <Button
-        android:id="@+id/save_foodshare"
+        android:id="@+id/save_chore_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="save"
+        android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/optional"
+        android:id="@+id/chore_assigned"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="*Optional"
-        app:layout_constraintBottom_toBottomOf="@+id/add_photo"
-        app:layout_constraintStart_toEndOf="@+id/add_photo"
-        app:layout_constraintTop_toTopOf="@+id/add_photo" />
+        android:text="No assigned person"
+        app:layout_constraintStart_toStartOf="@+id/chore_notes"
+        app:layout_constraintTop_toBottomOf="@+id/chore_notes" />
 
 </android.support.constraint.ConstraintLayout>
