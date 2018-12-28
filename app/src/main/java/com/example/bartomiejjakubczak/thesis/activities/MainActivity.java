@@ -27,6 +27,9 @@ import android.widget.Toast;
 
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.fragments.AssignPersonFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.ChoreFragmentInfo;
+import com.example.bartomiejjakubczak.thesis.fragments.ChoresFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.CreateChoreFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateFoodShareFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.CreateGroceryFragment;
@@ -35,9 +38,12 @@ import com.example.bartomiejjakubczak.thesis.fragments.FlatSearchFragmentUpdated
 import com.example.bartomiejjakubczak.thesis.fragments.FoodShareFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.FoodShareFragmentInfo;
 import com.example.bartomiejjakubczak.thesis.fragments.FunctionalitiesFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.GroceryCompletedFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.GroceryCompletedInfoFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.GroceryListBoughtFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.GroceryFragmentInfo;
 import com.example.bartomiejjakubczak.thesis.fragments.GroceryPendingFragment;
+import com.example.bartomiejjakubczak.thesis.fragments.GroceryReceiptFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.ManageFlatFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.NotificationsFragment;
 import com.example.bartomiejjakubczak.thesis.fragments.SwitchFlatFragment;
@@ -130,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 FragmentTransaction notificationsFragmentTransaction = notificationsFragmentManager.beginTransaction();
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
                 notificationsFragmentTransaction.replace(R.id.fragment_placeholder, notificationsFragment, "notificationsFragment");
+                notificationsFragmentManager.popBackStack("notificationsFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 notificationsFragmentTransaction.commit();
                 return true;
             case R.id.home_menu:
@@ -305,6 +312,14 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         CreateGroceryFragment createGroceryFragment = (CreateGroceryFragment) getFragmentManager().findFragmentByTag("createGroceryFragment");
         GroceryFragmentInfo groceryFragmentInfo = (GroceryFragmentInfo) getFragmentManager().findFragmentByTag("groceryFragmentInfo");
         GroceryListBoughtFragment groceryListBoughtFragment = (GroceryListBoughtFragment) getFragmentManager().findFragmentByTag("groceryListBoughtFragment");
+        GroceryCompletedFragment groceryCompletedFragment = (GroceryCompletedFragment) getFragmentManager().findFragmentByTag("groceryCompletedFragment");
+        GroceryCompletedInfoFragment groceryCompletedInfoFragment = (GroceryCompletedInfoFragment) getFragmentManager().findFragmentByTag("groceryCompletedInfoFragment");
+        GroceryReceiptFragment groceryReceiptFragment = (GroceryReceiptFragment) getFragmentManager().findFragmentByTag("groceryReceiptFragment");
+
+        ChoresFragment choresFragment = (ChoresFragment) getFragmentManager().findFragmentByTag("choresFragment");
+        ChoreFragmentInfo choreFragmentInfo = (ChoreFragmentInfo) getFragmentManager().findFragmentByTag("choreFragmentInfo");
+        CreateChoreFragment createChoreFragment = (CreateChoreFragment) getFragmentManager().findFragmentByTag("createChoreFragment");
+        AssignPersonFragment assignPersonFragment = (AssignPersonFragment) getFragmentManager().findFragmentByTag("assignPersonFragment");
 
         if (flatSearchFragment != null && flatSearchFragment.isVisible()) {
             setFunctionalitiesFragment();
@@ -332,11 +347,24 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
             setFunctionalitiesFragmentNoBacktrace();
         } else if (groceryListBoughtFragment != null && groceryListBoughtFragment.isVisible()) {
             setFunctionalitiesFragmentNoBacktrace();
+        } else if (groceryCompletedFragment != null && groceryCompletedFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (groceryCompletedInfoFragment != null && groceryCompletedInfoFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (groceryReceiptFragment != null && groceryReceiptFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (choresFragment != null && choresFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (choreFragmentInfo != null && choreFragmentInfo.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (createChoreFragment != null && createChoreFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
+        } else if (assignPersonFragment != null && assignPersonFragment.isVisible()) {
+            setFunctionalitiesFragmentNoBacktrace();
         }
     }
 
     private void setCurrentUserFlatsPrefs() {
-        Log.d(TAG, "setCurrentUserFlatsPrefs was called");
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mActionBar.setDisplayHomeAsUpEnabled(false);
         final ArrayList<String> currentSearchedUserFlatsKeys = new ArrayList<>();

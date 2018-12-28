@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.ListNotifications;
+import com.example.bartomiejjakubczak.thesis.models.AddedFoodShareNotification;
+import com.example.bartomiejjakubczak.thesis.models.AddedGroceryNotification;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +41,7 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
     private DatabaseReference mReceivedNotificationsDatabaseReference;
     private DatabaseReference mUserFlatsDatabaseReference;
     private DatabaseReference mFlatUsersDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
 
     public RequestsFragmentAdapter(Context context, ArrayList<ListNotifications> notifications, ArrayList<ListNotifications> notificationsCopy) {
         this.context = context;
@@ -62,6 +65,12 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
             case ListNotifications.TYPE_JOIN_NOTIFICATION:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.join_notification_model, parent, false);
                 return new RequestJoinFragmentHolder(view);
+            case ListNotifications.TYPE_FOODSHARE_ADDED_NOTIFICATION:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.foodshare_added_model, parent, false);
+                return new AddedFoodshareHolder(view);
+            case ListNotifications.TYPE_GROCERY_ADDED_NOTIFICATION:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.grocery_added_model, parent, false);
+                return new AddedGroceryHolder(view);
         }
         return null;
     }
@@ -103,6 +112,36 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 });
                 break;
+            case ListNotifications.TYPE_FOODSHARE_ADDED_NOTIFICATION:
+                final AddedFoodShareNotification addedFoodShareNotification = (AddedFoodShareNotification) notifications.get(position);
+                final AddedFoodshareHolder addedFoodshareHolder = (AddedFoodshareHolder) holder;
+
+                addedFoodshareHolder.title.setText("FOODSHARE");
+                addedFoodshareHolder.message.setText("User " + addedFoodShareNotification.getSenderKey() + " added new FoodShare item!");
+                addedFoodshareHolder.date.setText(addedFoodShareNotification.getDate());
+                addedFoodshareHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        removeAt(holder.getAdapterPosition());
+                        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(addedFoodShareNotification.getKey()).removeValue();
+                    }
+                });
+                break;
+            case ListNotifications.TYPE_GROCERY_ADDED_NOTIFICATION:
+                final AddedGroceryNotification addedGroceryNotification = (AddedGroceryNotification) notifications.get(position);
+                final AddedGroceryHolder addedGroceryHolder = (AddedGroceryHolder) holder;
+
+                addedGroceryHolder.title.setText("GROCERY");
+                addedGroceryHolder.message.setText("User " + addedGroceryNotification.getSenderKey() + " added new Grocery item!");
+                addedGroceryHolder.date.setText(addedGroceryNotification.getDate());
+                addedGroceryHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        removeAt(holder.getAdapterPosition());
+                        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(addedGroceryNotification.getKey()).removeValue();
+                    }
+                });
+                break;
         }
     }
 
@@ -127,5 +166,6 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
         mReceivedNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("notifications").child("receivedNotifications");
         mUserFlatsDatabaseReference = mFirebaseDatabase.getReference().child("userFlats");
         mFlatUsersDatabaseReference = mFirebaseDatabase.getReference().child("flatUsers");
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
     }
 }

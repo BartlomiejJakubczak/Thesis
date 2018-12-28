@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +18,19 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.models.AddedGroceryNotification;
 import com.example.bartomiejjakubczak.thesis.models.GroceryItem;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -38,6 +45,32 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mGroceryDatabaseReference;
+    private DatabaseReference mFlatUsersDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
+
+    private void sendNotifications() {
+        final ArrayList<String> userIDs = new ArrayList<>();
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        String formattedDate = sdf.format(date);
+        final AddedGroceryNotification addedGroceryNotification = new AddedGroceryNotification("Grocery", formattedDate, currentUserKey);
+        mFlatUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    userIDs.add(ds.getKey());
+                }
+                for (String key: userIDs) {
+                    mUsersDatabaseReference.child(key).child("notifications").child(addedGroceryNotification.getKey()).setValue(addedGroceryNotification);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,6 +113,7 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
                             Toast.makeText(MainActivity.getContext(), "Item successfully added", Toast.LENGTH_SHORT).show();
                         }
                     });
+                    sendNotifications();
                     name.setText("");
                     quantity.setText("");
                     notes.setText("");
@@ -99,6 +133,10 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mGroceryDatabaseReference = mFirebaseDatabase.getReference().child("grocery");
+        mFlatUsersDatabaseReference = mFirebaseDatabase.getReference()
+                .child("flatUsers")
+                .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)));
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
     }
 
     @Override

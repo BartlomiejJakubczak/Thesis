@@ -28,13 +28,17 @@ import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.models.AddedFoodShareNotification;
 import com.example.bartomiejjakubczak.thesis.models.FoodShareItem;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -43,12 +47,15 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class CreateFoodShareFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
     private final String TAG = "CreateFoodShareFragment";
+    private String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private String mCurrentPhotoPath = "";
     private boolean isPic = false;
@@ -65,6 +72,8 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     private FirebaseStorage mStorage;
     private StorageReference photoRef;
     private DatabaseReference mFoodShareDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mFlatUsersDatabaseReference;
 
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -210,6 +219,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
                     savePicInFirebaseStorage(foodShareItem.getKey());
                 }
             });
+            sendNotifications();
             saveButton.setEnabled(true);
             Toast.makeText(getActivity(), "Food item successfully added", Toast.LENGTH_SHORT).show();
             foodName.setText("");
@@ -222,6 +232,7 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
             saveButton.setEnabled(false);
             FoodShareItem foodShareItem = new FoodShareItem(name, quantity, expirationDate);
             mFoodShareDatabaseReference.child(loadStringFromSharedPrefs(getActivity(), "flat_key")).child(foodShareItem.getKey()).setValue(foodShareItem);
+            sendNotifications();
             saveButton.setEnabled(true);
             foodName.setText("");
             foodQuantity.setText("");
@@ -235,6 +246,32 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
             saveButton.setEnabled(true);
         }
 
+    }
+
+    private void sendNotifications() {
+        final ArrayList<String> userIDs = new ArrayList<>();
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        String formattedDate = sdf.format(date);
+        final AddedFoodShareNotification addedFoodShareNotification = new AddedFoodShareNotification("Foodshare", formattedDate, userDotlessEmail);
+        mFlatUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    userIDs.add(ds.getKey());
+                    Log.i(TAG, " " + ds.getKey());
+                }
+                for (String key: userIDs) {
+                    Log.i(TAG, " " + key);
+                    mUsersDatabaseReference.child(key).child("notifications").child(addedFoodShareNotification.getKey()).setValue(addedFoodShareNotification);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -295,6 +332,10 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mFoodShareDatabaseReference = mFirebaseDatabase.getReference().child("foodShare");
         photoRef = mStorage.getReference().child("images/FoodShare/" + loadStringFromSharedPrefs(getActivity(), "flat_key"));
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
+        mFlatUsersDatabaseReference = mFirebaseDatabase.getReference()
+                .child("flatUsers")
+                .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)));
     }
 
     @Override

@@ -16,6 +16,8 @@ import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.adapters.RequestsFragmentAdapter;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.ListNotifications;
+import com.example.bartomiejjakubczak.thesis.models.AddedFoodShareNotification;
+import com.example.bartomiejjakubczak.thesis.models.AddedGroceryNotification;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -65,10 +67,37 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                                     ds.child("sentNotificationKey").getValue().toString()
                             );
                             receivedNotifications.add(requestJoinNotification);
-
                         }
                     }
+                }}
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
+        });
+        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (ds.child("listNotificationType").getValue().toString().equals("2")) {
+                        final AddedFoodShareNotification addedFoodShareNotification = new AddedFoodShareNotification(
+                                ds.child("key").getValue().toString(),
+                                ds.child("topic").getValue().toString(),
+                                ds.child("date").getValue().toString(),
+                                ds.child("senderKey").getValue().toString()
+                        );
+                        receivedNotifications.add(addedFoodShareNotification);
+                    }
+                    if (ds.child("listNotificationType").getValue().toString().equals("3")) {
+                        final AddedGroceryNotification addedGroceryNotification = new AddedGroceryNotification(
+                                ds.child("key").getValue().toString(),
+                                ds.child("topic").getValue().toString(),
+                                ds.child("date").getValue().toString(),
+                                ds.child("senderKey").getValue().toString()
+                        );
+                        receivedNotifications.add(addedGroceryNotification);
+                    }
+                }
                 receivedNotificationsCopy.addAll(receivedNotifications);
                 Log.d("Notifications taken:", " " + receivedNotifications.size());
                 RequestsFragmentAdapter requestsFragmentAdapter = new RequestsFragmentAdapter(MainActivity.getContext(), receivedNotifications, receivedNotificationsCopy);
@@ -80,7 +109,6 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
 
             }
         });
-
     }
 
     @Nullable
