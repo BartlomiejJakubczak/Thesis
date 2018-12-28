@@ -53,9 +53,9 @@ public class ChoresFragmentAdapter extends RecyclerView.Adapter<ChoreHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final ChoreHolder holder, int position) {
-        holder.date.setText(chores.get(position).getDate());
+        holder.date.setText("Due on: " + chores.get(position).getDate());
         holder.personAssigned.setText("Assigned: " + chores.get(position).getPersonAssigned());
-        holder.name.setText(chores.get(position).getName());
+        holder.name.setText("Name: " + chores.get(position).getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

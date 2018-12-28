@@ -31,8 +31,8 @@ public class GroceryCompletedInfoAdapter extends RecyclerView.Adapter<GroceryCom
 
     @Override
     public void onBindViewHolder(@NonNull GroceryCompletedInfoHolder holder, int position) {
-        holder.name.setText(productsList.get(position).getName());
-        holder.quantity.setText(productsList.get(position).getQuantity());
+        holder.name.setText("Name: " + productsList.get(position).getName());
+        holder.quantity.setText("Quantity: " + productsList.get(position).getQuantity());
     }
 
     @Override

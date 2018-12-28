@@ -120,9 +120,19 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                 final AddedFoodShareNotification addedFoodShareNotification = (AddedFoodShareNotification) notifications.get(position);
                 final AddedFoodshareHolder addedFoodshareHolder = (AddedFoodshareHolder) holder;
 
-                addedFoodshareHolder.title.setText("FOODSHARE");
-                addedFoodshareHolder.message.setText("User " + addedFoodShareNotification.getSenderKey() + " added new FoodShare item!");
-                addedFoodshareHolder.date.setText(addedFoodShareNotification.getDate());
+                mUsersDatabaseReference.child(addedFoodShareNotification.getSenderKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        addedFoodshareHolder.title.setText("FOODSHARE");
+                        addedFoodshareHolder.message.setText("User " + dataSnapshot.child("tag").getValue().toString() + " added new FoodShare item!");
+                        addedFoodshareHolder.date.setText(addedFoodShareNotification.getDate());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
                 addedFoodshareHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -135,9 +145,19 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                 final AddedGroceryNotification addedGroceryNotification = (AddedGroceryNotification) notifications.get(position);
                 final AddedGroceryHolder addedGroceryHolder = (AddedGroceryHolder) holder;
 
-                addedGroceryHolder.title.setText("GROCERY");
-                addedGroceryHolder.message.setText("User " + addedGroceryNotification.getSenderKey() + " added new Grocery item!");
-                addedGroceryHolder.date.setText(addedGroceryNotification.getDate());
+                mUsersDatabaseReference.child(addedGroceryNotification.getSenderKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        addedGroceryHolder.title.setText("GROCERY");
+                        addedGroceryHolder.message.setText("User " + dataSnapshot.child("tag").getValue().toString() + " added new Grocery item!");
+                        addedGroceryHolder.date.setText(addedGroceryNotification.getDate());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
                 addedGroceryHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -150,9 +170,19 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                 final AddedChoreNotification addedChoreNotification = (AddedChoreNotification) notifications.get(position);
                 final AddedChoreHolder addedChoreHolder = (AddedChoreHolder) holder;
 
-                addedChoreHolder.title.setText("CHORES");
-                addedChoreHolder.message.setText("User " + addedChoreNotification.getSenderKey() + " added new Chore!");
-                addedChoreHolder.date.setText(addedChoreNotification.getDate());
+                mUsersDatabaseReference.child(addedChoreNotification.getSenderKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        addedChoreHolder.title.setText("CHORES");
+                        addedChoreHolder.message.setText("User " + dataSnapshot.child("tag").getValue().toString() + " added new Chore!");
+                        addedChoreHolder.date.setText(addedChoreNotification.getDate());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
                 addedChoreHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

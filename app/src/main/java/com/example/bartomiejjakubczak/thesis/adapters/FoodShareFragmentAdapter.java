@@ -43,8 +43,8 @@ public class FoodShareFragmentAdapter extends RecyclerView.Adapter<FoodShareFrag
 
     @Override
     public void onBindViewHolder(@NonNull final FoodShareFragmentHolder holder, int position) {
-        holder.name.setText(foodShareItems.get(position).getName());
-        holder.quantity.setText(foodShareItems.get(position).getQuantity());
+        holder.name.setText("Name: " + foodShareItems.get(position).getName());
+        holder.quantity.setText("Quantity: " + foodShareItems.get(position).getQuantity());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -36,19 +36,11 @@
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <ImageButton
-            android:id="@+id/edit_grocery_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            card_view:srcCompat="@drawable/ic_info_outline" />
-
-        <ImageButton
             android:id="@+id/add_grocery_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/model_grocery_date"
-            android:layout_alignStart="@+id/edit_grocery_button"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             card_view:srcCompat="@drawable/ic_add_shopping_cart" />
 
 

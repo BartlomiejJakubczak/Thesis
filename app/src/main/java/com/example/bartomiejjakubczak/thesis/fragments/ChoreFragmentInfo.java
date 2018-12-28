@@ -44,9 +44,9 @@ public class ChoreFragmentInfo extends Fragment implements FirebaseConnection, S
         mChoresDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                name.setText(dataSnapshot.child("name").getValue().toString());
-                date.setText(dataSnapshot.child("date").getValue().toString());
-                notes.setText(dataSnapshot.child("notes").getValue().toString());
+                name.setText("Name: " + dataSnapshot.child("name").getValue().toString());
+                date.setText("Due on: " + dataSnapshot.child("date").getValue().toString());
+                notes.setText("Notes: " + dataSnapshot.child("notes").getValue().toString());
                 personAssigned.setText("Assigned to: " + dataSnapshot.child("personAssigned").getValue().toString());
                 personAssigning.setText("Assigned by: " + dataSnapshot.child("personAssigning").getValue().toString());
                 if (personAssigned.getText().toString().equals(currentUserEmail)) {

@@ -15,6 +15,7 @@
         android:layout_marginTop="8dp"
         android:textSize="32sp"
         android:text="Welcome!"
+        android:gravity="center_horizontal"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,6 +31,7 @@
         android:text="It would have seem like you don't have a flat yet. You have an option to join an existing flat made by one of your friends, or create yourself a brand new flat!"
         android:textColor="@color/black"
         android:textSize="24sp"
+        android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_label" />

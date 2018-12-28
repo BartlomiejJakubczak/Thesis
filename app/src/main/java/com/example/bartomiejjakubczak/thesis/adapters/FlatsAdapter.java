@@ -54,8 +54,8 @@ public class FlatsAdapter extends RecyclerView.Adapter<FlatsHolder> implements S
         final String flatAddress = flats.get(position).getAddress();
         final String flatKey = flats.get(position).getKey();
 
-        holder.flatName.setText(flats.get(position).getName());
-        holder.flatAddress.setText(flats.get(position).getAddress());
+        holder.flatName.setText("Name: " + flats.get(position).getName());
+        holder.flatAddress.setText("Address: " + flats.get(position).getAddress());
         holder.flatKey = flats.get(position).getKey();
         holder.switchButton.setOnClickListener(new View.OnClickListener() {
             @Override

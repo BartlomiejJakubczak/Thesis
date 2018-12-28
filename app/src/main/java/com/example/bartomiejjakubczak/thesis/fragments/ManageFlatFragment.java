@@ -122,7 +122,7 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
                 oldAddress = dataSnapshot.child("address").getValue().toString();
                 flatAddress.setText(oldAddress);
                 flatAddress.setEnabled(false);
-                flatCode.setText(dataSnapshot.child("searchCode").getValue().toString());
+                flatCode.setText("Search code: " + dataSnapshot.child("searchCode").getValue().toString());
                 flatName.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {

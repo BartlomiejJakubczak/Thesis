@@ -55,9 +55,9 @@ public class GroceryFragmentPendingAdapter extends RecyclerView.Adapter<GroceryP
 
     @Override
     public void onBindViewHolder(@NonNull final GroceryPendingHolder holder, int position) {
-        holder.name.setText(groceryItems.get(position).getName());
-        holder.date.setText(groceryItems.get(position).getDate());
-        holder.info.setOnClickListener(new View.OnClickListener() {
+        holder.name.setText("Name: " + groceryItems.get(position).getName());
+        holder.date.setText("Added on: " + groceryItems.get(position).getDate());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();

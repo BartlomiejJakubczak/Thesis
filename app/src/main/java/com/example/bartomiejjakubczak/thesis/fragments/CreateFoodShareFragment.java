@@ -158,21 +158,21 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
             date = sdf.parse(value);
-            if (!value.equals(sdf.format(date))) {
+            if (date.before(new Date()) || !value.equals(sdf.format(date))) {
                 date = null;
             }
         } catch (ParseException ex) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
                 date = sdf.parse(value);
-                if (!value.equals(sdf.format(date))) {
+                if (date.before(new Date()) || !value.equals(sdf.format(date))) {
                     date = null;
                 }
             } catch (ParseException ex2) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
                     date = sdf.parse(value);
-                    if (!value.equals(sdf.format(date))) {
+                    if (date.before(new Date()) || !value.equals(sdf.format(date))) {
                         date = null;
                     }
                 } catch (ParseException ex3) {

@@ -16,6 +16,7 @@
         android:text="All you have to do now is wait. Meanwhile, you can create your own flat and use the app right away!"
         android:textColor="@color/black"
         android:textSize="24sp"
+        android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

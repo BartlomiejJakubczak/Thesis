@@ -236,7 +236,7 @@ public class GroceryFragmentInfo extends Fragment implements FirebaseConnection,
                     mUsersDatabaseReference.child(ownerKey).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            owner.setText(dataSnapshot.child("tag").getValue().toString());
+                            owner.setText("Person adding: " + dataSnapshot.child("tag").getValue().toString());
                         }
 
                         @Override
@@ -249,7 +249,7 @@ public class GroceryFragmentInfo extends Fragment implements FirebaseConnection,
                     mUsersDatabaseReference.child(ownerKey).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            owner.setText(dataSnapshot.child("tag").getValue().toString());
+                            owner.setText("Person adding: " + dataSnapshot.child("tag").getValue().toString());
                         }
 
                         @Override

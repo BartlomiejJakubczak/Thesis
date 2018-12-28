@@ -69,7 +69,7 @@ public class GroceryCompletedFragmentAdapter extends RecyclerView.Adapter<Grocer
 
             }
         });
-        holder.date.setText(groceryLists.get(position).getCompletionDate());
+        holder.date.setText("Bought on: " + groceryLists.get(position).getCompletionDate());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

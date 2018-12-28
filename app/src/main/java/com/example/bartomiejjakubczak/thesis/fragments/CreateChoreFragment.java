@@ -193,7 +193,7 @@ public class CreateChoreFragment extends Fragment implements FirebaseConnection,
         }
         try {
             String receivedAssignedTag = getArguments().getString("user_assigned_tag");
-            assignedPerson.setText(receivedAssignedTag);
+            assignedPerson.setText("Assigned person: " + receivedAssignedTag);
         } catch (NullPointerException e) {
             e.printStackTrace();
             assignedPerson.setText("No assigned person");

@@ -45,8 +45,8 @@ public class GroceryFragmentBoughtAdapter extends RecyclerView.Adapter<GroceryBo
 
     @Override
     public void onBindViewHolder(@NonNull final GroceryBoughtHolder holder, int position) {
-        holder.name.setText(boughtGrocery.get(position).getName());
-        holder.quantity.setText(boughtGrocery.get(position).getQuantity());
+        holder.name.setText("Name: " + boughtGrocery.get(position).getName());
+        holder.quantity.setText("Quantity: " + boughtGrocery.get(position).getQuantity());
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
