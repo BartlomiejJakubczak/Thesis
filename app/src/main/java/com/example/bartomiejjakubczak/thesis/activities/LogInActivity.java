@@ -93,17 +93,6 @@ public class LogInActivity extends AppCompatActivity implements FirebaseConnecti
     }
 
     private void startProperActivity() {
-        mUsersDatabaseReference.child(userDotlessEmail).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                putStringToSharedPrefs(getApplicationContext(), "shared_prefs_user_tag", dataSnapshot.child("tag").getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         mUserFlatsDatabaseReference.child(userDotlessEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
