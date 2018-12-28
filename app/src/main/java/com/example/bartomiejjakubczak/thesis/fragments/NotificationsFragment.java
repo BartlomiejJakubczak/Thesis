@@ -16,6 +16,7 @@ import com.example.bartomiejjakubczak.thesis.activities.MainActivity;
 import com.example.bartomiejjakubczak.thesis.adapters.RequestsFragmentAdapter;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.ListNotifications;
+import com.example.bartomiejjakubczak.thesis.models.AddedChoreNotification;
 import com.example.bartomiejjakubczak.thesis.models.AddedFoodShareNotification;
 import com.example.bartomiejjakubczak.thesis.models.AddedGroceryNotification;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
@@ -96,6 +97,15 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                                 ds.child("senderKey").getValue().toString()
                         );
                         receivedNotifications.add(addedGroceryNotification);
+                    }
+                    if (ds.child("listNotificationType").getValue().toString().equals("4")) {
+                        final AddedChoreNotification addedChoreNotification = new AddedChoreNotification(
+                                ds.child("key").getValue().toString(),
+                                ds.child("topic").getValue().toString(),
+                                ds.child("date").getValue().toString(),
+                                ds.child("senderKey").getValue().toString()
+                        );
+                        receivedNotifications.add(addedChoreNotification);
                     }
                 }
                 receivedNotificationsCopy.addAll(receivedNotifications);

@@ -18,15 +18,21 @@ import android.widget.Toast;
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.SharedPrefs;
+import com.example.bartomiejjakubczak.thesis.models.AddedChoreNotification;
 import com.example.bartomiejjakubczak.thesis.models.Chore;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -44,6 +50,32 @@ public class CreateChoreFragment extends Fragment implements FirebaseConnection,
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mChoresDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mFlatUsersDatabaseReference;
+
+    private void sendNotifications() {
+        final ArrayList<String> userIDs = new ArrayList<>();
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        String formattedDate = sdf.format(date);
+        final AddedChoreNotification addedChoreNotification = new AddedChoreNotification("Chores", formattedDate, currentUserEmail);
+        mFlatUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    userIDs.add(ds.getKey());
+                }
+                for (String key: userIDs) {
+                    mUsersDatabaseReference.child(key).child("notifications").child(addedChoreNotification.getKey()).setValue(addedChoreNotification);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     private boolean checkIfValidDate(String value) {
         Date date = null;
@@ -117,6 +149,7 @@ public class CreateChoreFragment extends Fragment implements FirebaseConnection,
                     saveButton.setEnabled(true);
                 }
             });
+            sendNotifications();
             this.name.setText("");
             this.date.setText("");
             this.notes.setText("");
@@ -179,6 +212,10 @@ public class CreateChoreFragment extends Fragment implements FirebaseConnection,
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mChoresDatabaseReference = mFirebaseDatabase.getReference()
                 .child("chores")
+                .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)));
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
+        mFlatUsersDatabaseReference = mFirebaseDatabase.getReference()
+                .child("flatUsers")
                 .child(loadStringFromSharedPrefs(getActivity(), getString(R.string.shared_prefs_flat_key)));
     }
 

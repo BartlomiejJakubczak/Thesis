@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.example.bartomiejjakubczak.thesis.R;
 import com.example.bartomiejjakubczak.thesis.interfaces.FirebaseConnection;
 import com.example.bartomiejjakubczak.thesis.interfaces.ListNotifications;
+import com.example.bartomiejjakubczak.thesis.models.AddedChoreNotification;
 import com.example.bartomiejjakubczak.thesis.models.AddedFoodShareNotification;
 import com.example.bartomiejjakubczak.thesis.models.AddedGroceryNotification;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
@@ -71,6 +72,9 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
             case ListNotifications.TYPE_GROCERY_ADDED_NOTIFICATION:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.grocery_added_model, parent, false);
                 return new AddedGroceryHolder(view);
+            case ListNotifications.TYPE_CHORE_ADDED_NOTIFICATION:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chore_added_model, parent, false);
+                return new AddedChoreHolder(view);
         }
         return null;
     }
@@ -139,6 +143,21 @@ public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
                     public void onClick(View v) {
                         removeAt(holder.getAdapterPosition());
                         mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(addedGroceryNotification.getKey()).removeValue();
+                    }
+                });
+                break;
+            case ListNotifications.TYPE_CHORE_ADDED_NOTIFICATION:
+                final AddedChoreNotification addedChoreNotification = (AddedChoreNotification) notifications.get(position);
+                final AddedChoreHolder addedChoreHolder = (AddedChoreHolder) holder;
+
+                addedChoreHolder.title.setText("CHORES");
+                addedChoreHolder.message.setText("User " + addedChoreNotification.getSenderKey() + " added new Chore!");
+                addedChoreHolder.date.setText(addedChoreNotification.getDate());
+                addedChoreHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        removeAt(holder.getAdapterPosition());
+                        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(addedChoreNotification.getKey()).removeValue();
                     }
                 });
                 break;
