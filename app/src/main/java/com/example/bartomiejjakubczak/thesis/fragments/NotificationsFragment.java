@@ -1,9 +1,11 @@
 package com.example.bartomiejjakubczak.thesis.fragments;
 
 import android.app.Fragment;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,6 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+
 public class NotificationsFragment extends Fragment implements FirebaseConnection {
 
     private String userDotlessEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replaceAll("[\\s.]", "");
@@ -47,6 +51,8 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
         recyclerView = view.findViewById(R.id.fragment_notifications_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         loadNotifications();
+        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_notifications_none);
+        MainActivity.mToolbar.getMenu().getItem(2).setIcon(drawable);
         return view;
     }
 
@@ -85,8 +91,10 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                                 ds.child("key").getValue().toString(),
                                 ds.child("topic").getValue().toString(),
                                 ds.child("date").getValue().toString(),
-                                ds.child("senderKey").getValue().toString()
+                                ds.child("senderKey").getValue().toString(),
+                                (boolean)ds.child("seen").getValue()
                         );
+                        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(ds.getKey()).child("seen").setValue(true);
                         receivedNotifications.add(addedFoodShareNotification);
                     }
                     if (ds.child("listNotificationType").getValue().toString().equals("3")) {
@@ -94,8 +102,10 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                                 ds.child("key").getValue().toString(),
                                 ds.child("topic").getValue().toString(),
                                 ds.child("date").getValue().toString(),
-                                ds.child("senderKey").getValue().toString()
+                                ds.child("senderKey").getValue().toString(),
+                                (boolean)ds.child("seen").getValue()
                         );
+                        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(ds.getKey()).child("seen").setValue(true);
                         receivedNotifications.add(addedGroceryNotification);
                     }
                     if (ds.child("listNotificationType").getValue().toString().equals("4")) {
@@ -103,8 +113,10 @@ public class NotificationsFragment extends Fragment implements FirebaseConnectio
                                 ds.child("key").getValue().toString(),
                                 ds.child("topic").getValue().toString(),
                                 ds.child("date").getValue().toString(),
-                                ds.child("senderKey").getValue().toString()
+                                ds.child("senderKey").getValue().toString(),
+                                (boolean)ds.child("seen").getValue()
                         );
+                        mUsersDatabaseReference.child(userDotlessEmail).child("notifications").child(ds.getKey()).child("seen").setValue(true);
                         receivedNotifications.add(addedChoreNotification);
                     }
                 }

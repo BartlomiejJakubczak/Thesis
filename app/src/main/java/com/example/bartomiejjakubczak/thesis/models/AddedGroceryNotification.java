@@ -10,19 +10,22 @@ public class AddedGroceryNotification implements ListNotifications {
     private String topic;
     private String date;
     private String senderKey;
+    private boolean seen;
 
     public AddedGroceryNotification(String topic, String date, String senderKey) {
         key = generateKey();
         this.topic = topic;
         this.date = date;
         this.senderKey = senderKey;
+        seen = false;
     }
 
-    public AddedGroceryNotification(String key, String topic, String date, String senderKey) {
+    public AddedGroceryNotification(String key, String topic, String date, String senderKey, boolean seen) {
         this.key = key;
         this.topic = topic;
         this.date = date;
         this.senderKey = senderKey;
+        this.seen = seen;
     }
 
     private String generateKey() {
@@ -57,4 +60,11 @@ public class AddedGroceryNotification implements ListNotifications {
         return date;
     }
 
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
 }

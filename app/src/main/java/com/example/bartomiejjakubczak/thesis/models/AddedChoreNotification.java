@@ -10,19 +10,22 @@ public class AddedChoreNotification implements ListNotifications {
     private String topic;
     private String date;
     private String senderKey;
+    private boolean seen;
 
     public AddedChoreNotification(String topic, String date, String senderKey) {
         key = generateKey();
         this.topic = topic;
         this.date = date;
         this.senderKey = senderKey;
+        seen = false;
     }
 
-    public AddedChoreNotification(String key, String topic, String date, String senderKey) {
+    public AddedChoreNotification(String key, String topic, String date, String senderKey, boolean seen) {
         this.key = key;
         this.topic = topic;
         this.date = date;
         this.senderKey = senderKey;
+        this.seen = seen;
     }
 
     private String generateKey() {
@@ -55,5 +58,13 @@ public class AddedChoreNotification implements ListNotifications {
 
     public String getDate() {
         return date;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
 }

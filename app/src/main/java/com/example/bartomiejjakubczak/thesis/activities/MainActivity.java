@@ -4,18 +4,18 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
-import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,13 +69,14 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private TextView mCurrentFlatAddress;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
-    private Toolbar mToolbar;
+    public static Toolbar mToolbar;
     private ActionBar mActionBar;
     private DrawerLayout.DrawerListener mDrawerListener;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ValueEventListener mFlatRemovalListener;
+    private ValueEventListener mUserNotificationListener;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mSearchedUserReference;
@@ -83,11 +84,11 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     private DatabaseReference mUsersFlatsDatabaseReference;
     private DatabaseReference mFlatsDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mCurrentUserNotificationsDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate was called");
         context = this;
         initializeFirebaseComponents();
         initializeFirebaseDatabaseReferences(currentUserEmail);
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         setViews();
         setDrawer();
         setCurrentUserFlatsPrefs();
+        setListenerForNotifications();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -131,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 mFirebaseAuth.signOut();
                 return true;
             case R.id.notifications_menu:
-                // TODO has to transmit between other fragments in drawers
                 FragmentManager notificationsFragmentManager = getFragmentManager();
                 FragmentTransaction notificationsFragmentTransaction = notificationsFragmentManager.beginTransaction();
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
@@ -151,6 +152,30 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setListenerForNotifications() {
+        mUserNotificationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean flag = true;
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (!(boolean)ds.child("seen").getValue()) {
+                        flag = false;
+                    }
+                }
+                if (!flag) {
+                    Drawable drawable = ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_notifications);
+                    mToolbar.getMenu().getItem(2).setIcon(drawable).setChecked(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        mCurrentUserNotificationsDatabaseReference.addValueEventListener(mUserNotificationListener);
     }
 
     private void setListenerForFlatRemoval() {
@@ -428,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
+        mCurrentUserNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("users").child(currentUserEmail).child("notifications");
         mSearchedUserReference = mUsersDatabaseReference.child(dotlessEmail);
         mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
         mSearchedUserFlatsDatabaseReference = mUsersFlatsDatabaseReference.child(dotlessEmail);
@@ -474,6 +500,9 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
         putStringToSharedPrefs(getApplicationContext(), "flat_key", "No flat yet");
         if (mFlatRemovalListener != null) {
             mUsersFlatsDatabaseReference.child(currentUserEmail).removeEventListener(mFlatRemovalListener);
+        }
+        if (mUserNotificationListener != null) {
+            mCurrentUserNotificationsDatabaseReference.removeEventListener(mUserNotificationListener);
         }
     }
 
