@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseConnection {
 
@@ -67,16 +69,14 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
     private void verdictFlatParameters(String newFlatName, String newFlatAddress) {
         checkIfCorrectFlatName(newFlatName);
         checkIfCorrectFlatAddress(newFlatAddress);
+        validFlatName = !checkIfSpecialCharacter(newFlatName);
+        validFlatAddress = !checkIfSpecialCharacter(newFlatAddress);
         if (!validFlatName) {
-            flatName.setError(getString(R.string.error_blank_field));
+            flatName.setError("This field is blank or contains special characters");
             flatName.setText(oldName);
-            flatName.setHintTextColor(getResources().getColor(R.color.red));
-            flatName.requestFocus();
         } else if (!validFlatAddress) {
-            flatAddress.setError(getString(R.string.error_blank_field));
+            flatAddress.setError("This field is blank or contains special characters");
             flatAddress.setText(oldAddress);
-            flatAddress.setHintTextColor(getResources().getColor(R.color.red));
-            flatAddress.requestFocus();
         } else {
             updateFlatParameters(newFlatName, newFlatAddress);
         }
@@ -84,6 +84,12 @@ public class EditFlatFragment extends Fragment implements SharedPrefs, FirebaseC
 
     private void checkIfCorrectFlatName(String newFlatName) {
         validFlatName = !checkIfEmpty(newFlatName);
+    }
+
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
     }
 
     private void checkIfCorrectFlatAddress(String newFlatAddress) {

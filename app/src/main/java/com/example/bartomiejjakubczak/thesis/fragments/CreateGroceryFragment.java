@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CreateGroceryFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
@@ -79,6 +81,12 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
         initializeFirebaseDatabaseReferences(currentUserKey);
     }
 
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -96,7 +104,7 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
                 String groceryQuantity = quantity.getText().toString();
                 String groceryNotes = notes.getText().toString();
 
-                if (!groceryName.trim().equals("")) {
+                if (!groceryName.trim().equals("") && !checkIfSpecialCharacter(groceryName) && !checkIfSpecialCharacter(groceryQuantity)) {
                     Date date = new Date();
                     Date newDate = new Date(date.getTime());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -118,7 +126,14 @@ public class CreateGroceryFragment extends Fragment implements FirebaseConnectio
                     quantity.setText("");
                     notes.setText("");
                 } else {
-                    name.setError("Field cannot be blank");
+                    if (groceryName.trim().equals("")) {
+                        name.setError("This field cannot be blank");
+                    } else if (checkIfSpecialCharacter(groceryName)) {
+                        name.setError("This field cannot contain special characters");
+                    }
+                    if (checkIfSpecialCharacter(groceryQuantity)) {
+                        quantity.setError("This field cannot contain special characters");
+                    }
                 }
             }
         });

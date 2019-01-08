@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CreateFoodShareFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
@@ -138,7 +140,10 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     private void savePicInFirebaseStorage(String foodShareKey) {
         File f = new File(mCurrentPhotoPath);
         Uri contentUri = Uri.fromFile(f);
-        photoRef = mStorage.getReference().child("images/FoodShare/" + loadStringFromSharedPrefs(getActivity(), "flat_key") + "/" + foodShareKey);
+        photoRef = mStorage.getReference()
+                .child("images/FoodShare/" +
+                        loadStringFromSharedPrefs(getActivity(), "flat_key") +
+                        "/" + foodShareKey);
         UploadTask uploadTask = photoRef.putFile(contentUri);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -151,6 +156,12 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
     private boolean checkIfEmpty(String string) {
         String testString = string.trim();
         return "".equals(testString);
+    }
+
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
     }
 
     private boolean checkIfValidDate(String value) {
@@ -195,8 +206,22 @@ public class CreateFoodShareFragment extends Fragment implements FirebaseConnect
             validName = true;
         }
 
+        if (checkIfSpecialCharacter(name)) {
+            foodName.setError("This field cannot contain special characters");
+            validName = false;
+        } else {
+            validName = true;
+        }
+
         if (checkIfEmpty(quantity)) {
             foodQuantity.setError("This field cannot be blank");
+            validQuantity = false;
+        } else {
+            validQuantity = true;
+        }
+
+        if (checkIfSpecialCharacter(quantity)) {
+            foodQuantity.setError("This field cannot contain special characters");
             validQuantity = false;
         } else {
             validQuantity = true;

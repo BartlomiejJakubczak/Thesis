@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CreateChoreFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
@@ -112,6 +114,12 @@ public class CreateChoreFragment extends Fragment implements FirebaseConnection,
         return "".equals(testString);
     }
 
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
+    }
+
     private void saveInfoInDatabase(String name, String date, String notes, String assignedPerson) {
 
         boolean validName;
@@ -120,6 +128,13 @@ public class CreateChoreFragment extends Fragment implements FirebaseConnection,
 
         if (checkIfEmpty(name.trim())) {
             this.name.setError("This field cannot be blank");
+            validName = false;
+        } else {
+            validName = true;
+        }
+
+        if (checkIfSpecialCharacter(name.trim())) {
+            this.name.setError("This field cannot contain special characters");
             validName = false;
         } else {
             validName = true;

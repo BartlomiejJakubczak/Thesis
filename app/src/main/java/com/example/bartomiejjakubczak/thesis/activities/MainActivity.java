@@ -165,7 +165,8 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
                     }
                 }
                 if (!flag) {
-                    Drawable drawable = ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_notifications);
+                    Drawable drawable = ContextCompat
+                            .getDrawable(getApplicationContext(),R.drawable.ic_notifications);
                     mToolbar.getMenu().getItem(2).setIcon(drawable).setChecked(true);
                 }
             }
@@ -453,7 +454,10 @@ public class MainActivity extends AppCompatActivity implements SharedPrefs, Fire
     @Override
     public void initializeFirebaseDatabaseReferences(String dotlessEmail) {
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_users));
-        mCurrentUserNotificationsDatabaseReference = mFirebaseDatabase.getReference().child("users").child(currentUserEmail).child("notifications");
+        mCurrentUserNotificationsDatabaseReference = mFirebaseDatabase.getReference()
+                .child("users")
+                .child(currentUserEmail)
+                .child("notifications");
         mSearchedUserReference = mUsersDatabaseReference.child(dotlessEmail);
         mUsersFlatsDatabaseReference = mFirebaseDatabase.getReference().child(getString(R.string.firebase_reference_user_flats));
         mSearchedUserFlatsDatabaseReference = mUsersFlatsDatabaseReference.child(dotlessEmail);

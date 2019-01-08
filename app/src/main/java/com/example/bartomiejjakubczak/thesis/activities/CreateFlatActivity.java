@@ -28,6 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs, FirebaseConnection {
 
     private static final String TAG = "CreateFlatActivity";
@@ -95,8 +98,13 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
 
                 if (checkIfEmpty(name)) {
                     flatName.setError(getString(R.string.error_blank_field));
-                    flatName.setText("");
-                    flatName.setHintTextColor(getResources().getColor(R.color.red));
+                    validName = false;
+                } else {
+                    validName = true;
+                }
+
+                if (checkIfSpecialCharacter(name)) {
+                    flatName.setError("This field cannot contain special characters");
                     validName = false;
                 } else {
                     validName = true;
@@ -104,8 +112,13 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
 
                 if (checkIfEmpty(address)) {
                     flatAddress.setError(getString(R.string.error_blank_field));
-                    flatAddress.setText("");
-                    flatAddress.setHintTextColor(getResources().getColor(R.color.red));
+                    validAddress = false;
+                } else {
+                    validAddress = true;
+                }
+
+                if (checkIfSpecialCharacter(address)) {
+                    flatAddress.setError("This field cannot contain special characters");
                     validAddress = false;
                 } else {
                     validAddress = true;
@@ -124,6 +137,11 @@ public class CreateFlatActivity extends AppCompatActivity implements SharedPrefs
         return "".equals(testString);
     }
 
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
+    }
 
     private void createNewFlat(final String roomName, final String roomAddress, final String userDotlessEmail) {
         final Flat newFlat = new Flat(roomName, roomAddress, userDotlessEmail, loadStringFromSharedPrefs(getApplicationContext(), "shared_prefs_user_tag"));

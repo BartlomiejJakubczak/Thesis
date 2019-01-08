@@ -95,6 +95,12 @@ public class FoodShareFragmentInfo extends Fragment implements FirebaseConnectio
         return date != null;
     }
 
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
+    }
+
     private void setButtons() {
         editName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,8 +154,22 @@ public class FoodShareFragmentInfo extends Fragment implements FirebaseConnectio
                     validName = true;
                 }
 
+                if (checkIfSpecialCharacter(newName)) {
+                    name.setError("This field cannot contain special characters");
+                    validName = false;
+                } else {
+                    validName = true;
+                }
+
                 if (newQuantity.trim().equals("")) {
                     quantity.setError("Field cannot be blank");
+                    validQuantity = false;
+                } else {
+                    validQuantity = true;
+                }
+
+                if (checkIfSpecialCharacter(newQuantity)) {
+                    quantity.setError("This field cannot contain special characters");
                     validQuantity = false;
                 } else {
                     validQuantity = true;

@@ -36,6 +36,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ManageFlatFragment extends Fragment implements FirebaseConnection, SharedPrefs {
 
@@ -93,15 +95,34 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
                     saveChangesButton.setEnabled(false);
                     final String newName = flatName.getText().toString();
                     final String newAddress = flatAddress.getText().toString();
-                    mSearchedFlatDatabaseReference.child("name").setValue(newName);
-                    mSearchedFlatDatabaseReference.child("address").setValue(newAddress).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(getActivity(), "Changes saved", Toast.LENGTH_SHORT).show();
-                            oldName = newName;
-                            oldAddress = newAddress;
-                        }
-                    });
+
+                    if (checkIfEmpty(newName)) {
+                        flatName.setError("This field cannot be blank");
+                    } else if (checkIfSpecialCharacter(newName)) {
+                        flatName.setError("This field cannot contain special characters");
+                    } else if (!newName.equals(oldName)){
+                        mSearchedFlatDatabaseReference.child("name").setValue(newName).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(getActivity(), "Changes saved", Toast.LENGTH_SHORT).show();
+                                oldName = newName;
+                            }
+                        });
+                    }
+
+                    if (checkIfEmpty(newAddress)) {
+                        flatAddress.setError("This field cannot be blank");
+                    } else if (checkIfSpecialCharacter(newAddress)) {
+                        flatAddress.setError("This field cannot contain special characters");
+                    } else if(!newAddress.equals(oldAddress)){
+                        mSearchedFlatDatabaseReference.child("address").setValue(newAddress).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(getActivity(), "Changes saved", Toast.LENGTH_SHORT).show();
+                                oldAddress = newAddress;
+                            }
+                        });
+                    }
                 }
             });
 
@@ -110,6 +131,17 @@ public class ManageFlatFragment extends Fragment implements FirebaseConnection, 
             editFlatAddressButton.setVisibility(View.GONE);
             saveChangesButton.setVisibility(View.GONE);
         }
+    }
+
+    private boolean checkIfSpecialCharacter(String string) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(string);
+        return m.find();
+    }
+
+    private boolean checkIfEmpty(String string) {
+        String testString = string.trim();
+        return "".equals(testString);
     }
 
     private void setEditTexts() {
