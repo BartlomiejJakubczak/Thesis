@@ -17,6 +17,7 @@ import com.example.bartomiejjakubczak.thesis.interfaces.ListNotifications;
 import com.example.bartomiejjakubczak.thesis.models.AddedChoreNotification;
 import com.example.bartomiejjakubczak.thesis.models.AddedFoodShareNotification;
 import com.example.bartomiejjakubczak.thesis.models.AddedGroceryNotification;
+import com.example.bartomiejjakubczak.thesis.models.CompletedGroceryList;
 import com.example.bartomiejjakubczak.thesis.models.RequestJoinNotification;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,8 +28,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class RequestsFragmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements FirebaseConnection {
 

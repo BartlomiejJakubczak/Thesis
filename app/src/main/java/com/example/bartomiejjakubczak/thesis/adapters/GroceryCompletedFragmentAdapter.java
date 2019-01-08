@@ -23,7 +23,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
 
 public class GroceryCompletedFragmentAdapter extends RecyclerView.Adapter<GroceryCompletedHolder> implements FirebaseConnection {
 
@@ -38,9 +46,28 @@ public class GroceryCompletedFragmentAdapter extends RecyclerView.Adapter<Grocer
     public GroceryCompletedFragmentAdapter(Context context, GroceryCompletedFragment groceryCompletedFragment, ArrayList<CompletedGroceryList> groceryLists) {
         this.context = context;
         this.groceryLists.addAll(groceryLists);
+        Collections.sort(this.groceryLists, new Comparator<CompletedGroceryList>() {
+            @Override
+            public int compare(CompletedGroceryList o1, CompletedGroceryList o2) {
+                Date date1 = toDate(o1.getCompletionDate());
+                Date date2 = toDate(o2.getCompletionDate());
+                return date2.compareTo(date1);
+            }
+        });
         this.groceryCompletedFragment = groceryCompletedFragment;
         initializeFirebaseComponents();
         initializeFirebaseDatabaseReferences(currentUserKey);
+    }
+
+    private Date toDate(String dateString) {
+        Date date = null;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        try {
+            date = dateFormat.parse(dateString);
+        } catch (ParseException parseException) {
+            parseException.printStackTrace();
+        }
+        return date;
     }
 
     public void receiveNewList(ArrayList<CompletedGroceryList> groceryLists) {
