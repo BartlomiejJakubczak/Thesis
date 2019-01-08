@@ -44,6 +44,7 @@ public class GroceryCompletedInfoFragment extends Fragment implements FirebaseCo
     private ArrayList<GroceryItem> productsList = new ArrayList<>();
 
     private RecyclerView recyclerView;
+    private GroceryCompletedInfoAdapter groceryCompletedInfoAdapter;
     private Button receiptButton;
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -51,41 +52,45 @@ public class GroceryCompletedInfoFragment extends Fragment implements FirebaseCo
     private DatabaseReference mGroceryBoughtDatabaseReference;
 
     private void loadData() {
-        mGroceryBoughtDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                photoStoragePath = dataSnapshot.child("receiptURI").getValue().toString();
-                Log.i("GroceryCompletedInfo", " " + photoStoragePath);
-                receiptButton.setEnabled(true);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        mGroceryBoughtDatabaseReference.child("productList").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    productsList.add(new GroceryItem(
-                            ds.child("key").getValue().toString(),
-                            ds.child("name").getValue().toString(),
-                            ds.child("quantity").getValue().toString(),
-                            ds.child("notes").getValue().toString(),
-                            ds.child("addingPersonKey").getValue().toString(),
-                            ds.child("date").getValue().toString()
-                    ));
+            mGroceryBoughtDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    photoStoragePath = dataSnapshot.child("receiptURI").getValue().toString();
+                    Log.i("GroceryCompletedInfo", " " + photoStoragePath);
+                    receiptButton.setEnabled(true);
                 }
-                GroceryCompletedInfoAdapter groceryCompletedInfoAdapter = new GroceryCompletedInfoAdapter(getActivity(), productsList);
-                recyclerView.setAdapter(groceryCompletedInfoAdapter);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+            mGroceryBoughtDatabaseReference.child("productList").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        productsList.add(new GroceryItem(
+                                ds.child("key").getValue().toString(),
+                                ds.child("name").getValue().toString(),
+                                ds.child("quantity").getValue().toString(),
+                                ds.child("notes").getValue().toString(),
+                                ds.child("addingPersonKey").getValue().toString(),
+                                ds.child("date").getValue().toString()
+                        ));
+                    }
+                    if (groceryCompletedInfoAdapter == null) {
+                        groceryCompletedInfoAdapter = new GroceryCompletedInfoAdapter(getActivity(), productsList);
+                        recyclerView.setAdapter(groceryCompletedInfoAdapter);
+                    } else {
+                        recyclerView.setAdapter(groceryCompletedInfoAdapter);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
     }
 
     @Override
